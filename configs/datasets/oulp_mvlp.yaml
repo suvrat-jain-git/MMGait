@@ -1,0 +1,67 @@
+dataset:
+  name: OU-MVLP
+  root: /data/oulp_mvlp/   # UPDATE to your actual server path after
+                           # transferring from the NUC
+
+  # --- Silhouette Properties ---
+  image_size: [64, 64]       # Matches FVG-B's resolution -- required for
+                              # cross-dataset comparison validity and
+                              # the GaitBase ablation's expected input size.
+  in_channels: 1
+  # Tensor shape produced by dataloader: [B, T, 1, 64, 64]
+
+  # --- Sequence Settings ---
+  sequence_length: 30        # T -- same flag-controlled convention as
+                              # every other dataset (--seq_len overrides)
+
+  # --- Directory Structure ---
+  # GEI/{view}-{sequence}/{subject}.png
+  # Silhouette_{view}-{sequence}/{subject}/{frame}.png
+  # See datasets/oulp_mvlp.py module docstring for the full set of
+  # confirmed structure details and remaining format assumptions still
+  # flagged for verification. Run:
+  #   python datasets/oulp_mvlp.py <root> <gender_file> <age_file>
+  # BEFORE the first real training run.
+
+  # --- Label files (filenames, relative to `root` above) ---
+  # CONFIRM these match your actual downloaded filenames -- the
+  # official page links them as "Subject_List" / "Subject list with
+  # age and gender" without showing the literal saved filename.
+  gender_label_file: subject_list.csv
+  age_gender_intersection_file: subject_list_age_gender.csv
+
+  # --- Train/Test Split ---
+  # STANDARD OU-MVLP split (subject ID range, NOT random) -- hardcoded
+  # in datasets/oulp_mvlp.py as TRAIN_ID_MAX=5153, matching every
+  # published OU-MVLP benchmark. Do not override this via config; it's
+  # a fixed constant deliberately, since changing it would make results
+  # non-comparable to published baselines.
+  val_fraction: 0.1          # Stratified by gender, carved from the
+                              # training subject pool only.
+
+  # --- Evaluation Protocol Flag ---
+  # false (default): same_view mode. Probe view N evaluated only
+  #     against gallery view N. 14 independent protocol entries
+  #     ('view_000' .. 'view_270'), each a standard single-view
+  #     Rank-1/EER. Cheap -- this is what runs during the mid-training
+  #     checkpoint-selection check regardless of this flag.
+  # true: cross_view mode. ALSO runs the literature-standard 14x13=182
+  #     pair cross-view aggregation when evaluators/gait_eval.py is run
+  #     standalone (NOT during train.py's mid-training check, which
+  #     always uses the cheap same_view first-protocol lookup
+  #     regardless of this flag, to avoid making every 10th epoch
+  #     prohibitively slow). Use this for the final reported benchmark
+  #     numbers, not for routine mid-training monitoring.
+  cross_view: false
+
+  # --- Labels ---
+  gender_classes: 2          # Male=0, Female=1 -- dataset-wide
+  # age is NOT dataset-wide -- only the age/gender intersection subset
+  # has age labels. Citing Xu et al.'s age-estimation paper is required
+  # in addition to the main OU-MVLP citation when using these labels --
+  # see datasets/oulp_mvlp.py module docstring.
+  identity_classes: null     # Set automatically (5153 train identities)
+
+  # --- Augmentation (training only) ---
+  augmentation:
+    horizontal_flip: true

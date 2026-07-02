@@ -1,0 +1,59 @@
+training:
+  epochs: 150
+  batch_size: 16      # fallback only — PKSampler overrides with P*K
+  num_workers: 4
+  P: 8               # identities per batch (PKSampler)
+  K: 4               # samples per identity per batch (PKSampler)
+  seed: 42
+
+  optimizer:
+    name: Adam
+    lr: 0.0003
+    weight_decay: 0.0005
+
+  scheduler:
+    name: CosineAnnealingLR
+    T_max: 100              # Matches epochs
+    eta_min: 0.000001
+
+  # --- Loss Weights ---
+  # Total loss = w_id * L_identity + w_tri * L_triplet + w_gen * L_gender
+  loss_weights:
+    identity: 0.5           # Reduced — triplet should dominate for retrieval
+    triplet: 1.0
+    orthogonality: 0.05     # Barlow Twins weight (V5 formulation — see
+                             # losses/barlow_twins.py for why this exact
+                             # value + normalisation was chosen over every
+                             # other variant tried)
+    gender: 0.5              # Only applied if the active dataset has
+                              # gender labels (CombinedLoss detects this
+                              # from model_output key presence — see
+                              # losses/combined_loss.py). Harmless to
+                              # leave set when running on a no-gender
+                              # dataset; it simply never gets used.
+    age_cls: 0.3              # Age-bin classification CE weight.
+                                # Same conditional-use note as gender above.
+    age_reg: 0.3               # Age regression (years, L1) weight.
+
+  # --- ArcFace settings ---
+  arcface:
+    s: 32.0                 # Reduced from 64 — with 117 classes, 64 is too large
+    m: 0.3                  # Reduced from 0.5 — margin too aggressive for small #classes
+
+  # --- V6: Cosine Orthogonality + Static Suppression ---
+  # Static suppression in motion branch (motion - 0.5*GEI)
+  # forces motion encoder to explain dynamic content only
+
+  # --- Triplet Loss Settings ---
+  triplet:
+    margin: 0.5             # Increased from 0.3 — previous margin too easy
+    mining: hard            # Hard negative mining
+
+  # --- Checkpointing ---
+  checkpoint:
+    save_dir: experiments/
+    save_every: 10          # Save checkpoint every N epochs
+    keep_best: true         # Always keep best validation checkpoint
+
+  # --- Logging ---
+  log_every: 50             # Log every N batches

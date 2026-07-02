@@ -1,0 +1,80 @@
+dataset:
+  name: FVG-B
+  root: /data/suvrat/fvg_b/
+
+  # --- Silhouette Properties ---
+  image_size: [64, 64]       # (H, W) — resize target.
+                              # Reduced from the original 224x224 --
+                              # matches OpenGait's GaitBase/GaitSet/GaitGL
+                              # default resolution, which is the resolution
+                              # the GaitBase pretrained backbone ablation
+                              # expects. Keeping FVG-B and OU-LP-Bag at the
+                              # SAME resolution is required for any
+                              # cross-dataset comparison to be meaningful.
+  in_channels: 1             # Grayscale silhouettes
+  # Tensor shape produced by dataloader: [B, T, 1, 224, 224]
+
+  # --- Sequence Settings ---
+  sequence_length: 30        # T — contiguous frames sampled per sequence.
+                              # Flag-controlled via --seq_len at the CLI;
+                              # this is just the default. Both FVG-B and
+                              # OU-LP-Bag pad/truncate to the SAME T value
+                              # passed at runtime (see datasets/base.py).
+                             # Training: random start window
+                             # Eval: centre-aligned window
+                             # If sequence < T frames: tiled from start
+
+  # --- Directory Structure ---
+  # crop_sil/session{1,2,3}/{subject_id:03d}/{seq_id:02d}/{frame:05d}.png
+
+  # --- Session / Subject Mapping (FVG-B report Table 2) ---
+  # Subjects   1-147  -> Session 1  (collected 2017)
+  # Subjects 148-226  -> Session 2  (collected 2018)
+  # Session 3         -> small subset (bold in Table 2, collected 2018)
+  # Splits provided by dataset:
+  #   train_id_list.txt  — subject IDs for training
+  #   test_id_list.txt   — subject IDs for test (gallery + probe)
+
+  # --- Sequence Meaning (FVG-B report Table 1) ---
+  # Session 1:
+  #   01,02,03 -> Normal walk  (angles -45°, 0°, +45°)
+  #   04,05,06 -> Fast walk
+  #   07,08,09 -> Slow walk
+  #   10,11,12 -> Bag / Hat
+  # Session 2:
+  #   01,02,03 -> Normal walk
+  #   04,05,06 -> Fast walk
+  #   07,08,09 -> Change clothes
+  #   10,11,12 -> Multiple person
+
+  # --- Official Evaluation Protocols (FVG-B report Table 3) ---
+  # Gallery is ALWAYS sequence '02'.
+  #
+  # Protocol | Gal. Sessions      | Probe
+  # ---------|--------------------|----------------------------------------
+  # WS       | Sess1+2 seq02      | Sess1 seq04-09, Sess2 seq04-06
+  # BGHT     | Sess1 seq02        | Sess1 seq10-12
+  # CL       | Sess2 seq02        | Sess2 seq07-09
+  # MP       | Sess2 seq02        | Sess2 seq10-12
+  # ALL      | Sess1+2 seq02      | Sess1 seq01,03-12 + Sess2 seq01,03-12
+  #          |                    | + Sess3 seq01-12
+
+  # --- Database Split ---
+  # Gallery subjects randomly selected at 1% and 5% of test subjects.
+  # Remaining test subjects are probe.
+  # seed: 0  (original paper seed not publicly available — documented in fvg_b.py)
+  gallery_seed: 0
+
+  # --- Train/Val Split ---
+  # Carved from train_id_list.txt — no separate val file provided.
+  val_fraction: 0.15         # 15% val — gives ~20 subjects for stable gender_acc
+
+  # --- Augmentation (training only) ---
+  augmentation:
+    horizontal_flip: true    # p=0.5, applied consistently across all T frames
+    random_crop: false       # Keep false for V1
+    temporal_jitter: false   # Keep false for V1
+
+  # --- Labels ---
+  gender_classes: 2          # Male=0, Female=1
+  identity_classes: null     # Set automatically from train_id_list.txt at runtime

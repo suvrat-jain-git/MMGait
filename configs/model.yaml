@@ -1,0 +1,63 @@
+model:
+  name: BioKinematicNet
+
+  # --- Morphology Branch ---
+  morphology:
+    in_channels: 1          # Single-channel silhouette (GEI is grayscale)
+    channels: [32, 64, 128, 256, 512]   # 5 entries = 5 conv blocks' OUTPUT
+                                          # channels. in_channels is supplied
+                                          # separately above, NOT prepended
+                                          # to this list (see
+                                          # models/morphology/morphology_encoder.py
+                                          # docstring -- len(channels) MUST
+                                          # equal len(strides) below)
+    strides:   [1,  2,  1,   2,   2]
+    out_dim: 512
+
+  # --- Motion Branch ---
+  motion:
+    in_channels: 1          # Single-channel motion difference volume
+    channels: [32, 64, 128, 256, 512]    # same convention as morphology
+    strides:                # (temporal, height, width) per layer
+      - [1, 1, 1]
+      - [2, 2, 2]
+      - [1, 1, 1]
+      - [2, 2, 2]
+      - [1, 1, 1]
+    out_dim: 512
+    static_suppression_beta: 0.5   # motion_input = motion - beta*GEI
+                                     # forces motion encoder to explain only
+                                     # dynamic content not already explained
+                                     # by static body shape
+
+  # --- Bio-Kinematic Graph (ablation-flag-controlled) ---
+  graph:
+    enabled: true            # --no_graph CLI flag sets this to false at
+                              # runtime for the ablation: does cross-branch
+                              # interaction help, given alpha consistently
+                              # converged to ~0.1 (near its init value)
+                              # across every V1 multi-seed run?
+    node_dim: 512             # Fm and Fk both live in R^512
+    alpha_init: 0.1           # Initial scale of cross-branch message
+    alpha_learnable: true     # Let the network adjust interaction strength
+
+  # --- Projection (before identity fusion) ---
+  projection:
+    in_dim: 512
+    out_dim: 256             # Each branch compressed before concat
+
+  # --- Identity Head (always present -- every dataset supports identity) ---
+  identity:
+    in_dim: 512              # 256 + 256 after projection + concat
+    hidden_dim: 512
+    embedding_dim: 512       # Final identity embedding size
+    # num_classes is NOT set here -- injected at runtime from
+    # DatasetMeta.num_identities by train.py, since it depends on which
+    # dataset/split is active.
+
+  # NOTE: 'gender' and 'age' head configs are intentionally NOT defined
+  # here. They live in configs/heads.yaml and are merged into the model
+  # config by train.py ONLY when the active dataset's DatasetMeta reports
+  # has_gender/has_age = True. This is what makes head instantiation
+  # genuinely conditional rather than "always built, sometimes unused" --
+  # see models/biokinematic_net.py for the consuming logic.

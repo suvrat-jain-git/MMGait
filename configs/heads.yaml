@@ -1,0 +1,22 @@
+# heads.yaml — Conditional Task Head Configurations
+#
+# These blocks are NOT unconditionally merged into the model config.
+# train.py reads the active dataset's DatasetMeta (has_gender, has_age)
+# and only injects the corresponding block below into cfg['model'] when
+# the metadata says the label exists. If neither flag is set for a
+# dataset, neither block below is ever touched -- the model is built
+# with gender_head=None and age_head=None (see biokinematic_net.py).
+
+gender:
+  in_dim: 512               # Uses Fm' only (morphology after graph)
+  hidden_dim: 128
+  num_classes: 2            # Male / Female
+
+age:
+  in_dim: 512                # Uses Fm' only (same rationale as gender --
+                              # see models/heads/age_head.py docstring)
+  hidden_dim: 256
+  num_bins: 7                 # Matches datasets/base.py AGE_BINS
+                               # (7-bin literature convention: child, teen,
+                               # young_adult, adult, middle_aged, mature,
+                               # senior)
