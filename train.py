@@ -1,34 +1,3 @@
-"""
-train.py — Main Training Entry Point (V2: dataset-agnostic)
-
-Usage:
-    python train.py --dataset fvgb
-    python train.py --dataset oulp_mvlp
-    python train.py --dataset fvgb --no_graph
-    python train.py --dataset fvgb --seed 123
-    python train.py --dataset fvgb --resume experiments/epoch_010.pth
-
-What this does:
-    1. Parse CLI args (--dataset, --no_graph, --morph_backbone, --seq_len,
-       --seed, --resume, --device)
-    2. Build config: model.yaml + heads.yaml + train.yaml + the active
-       dataset's own yaml (looked up via datasets/registry.py)
-    3. Build dataloaders via the dataset registry -- train.py never
-       imports a specific dataset module directly
-    4. Build model via models/factory.py -- gender_head/age_head are
-       conditionally instantiated based on the dataset's DatasetMeta,
-       NOT based on anything train.py decides itself
-    5. Build optimizer + scheduler + loss + trainer
-    6. Run training loop, logging whichever loss/metric keys are
-       actually present for this dataset (see trainers/trainer.py)
-
-This file is intentionally free of any dataset-specific logic (no
-"if dataset == 'fvgb'" anywhere) -- that branching lives entirely in
-datasets/registry.py (which builder to call) and is reflected through
-DatasetMeta into models/factory.py (which heads to build). Adding a new
-dataset should never require touching this file.
-"""
-
 import argparse
 import random
 import numpy as np
@@ -88,6 +57,11 @@ def parse_args():
                         help='Disable the Bio-Kinematic Graph (ablation): '
                              'Fm and Fk pass straight through with no '
                              'cross-branch interaction at all')
+    parser.add_argument('--save_dir', default=None,
+                        help='Override checkpoint save directory from config. '
+                             'Use this when running multiple seeds in parallel '
+                             'to prevent them overwriting each other, e.g. '
+                             '--save_dir experiments/fvgb_seed42')
     parser.add_argument('--morph_backbone', default='custom',
                         choices=['custom', 'gaitbase'],
                         help="Morphology branch backbone. 'gaitbase' "
@@ -111,6 +85,9 @@ def main():
 
     if args.seq_len is not None:
         cfg['dataset']['sequence_length'] = args.seq_len
+
+    if args.save_dir is not None:
+        cfg['training']['checkpoint']['save_dir'] = args.save_dir
 
     # -- Reproducibility --------------------------------------------------
     seed = args.seed

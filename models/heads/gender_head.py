@@ -1,47 +1,3 @@
-"""
-gender_head.py — Gender Classification Head
-
-What this module does:
-    Takes Fm' [B, 512] — the morphology feature AFTER graph interaction —
-    and classifies the subject's gender (Male=0, Female=1).
-
-    FC: 512 → 128 → 2
-    Output: gender logits [B, 2]
-    Loss:   CrossEntropyLoss
-
-Why Fm' and NOT the fused feature:
-    This is one of the two core scientific claims of the paper:
-
-        Gender is a property of body shape, not of how you walk.
-
-    By routing only the morphology branch to the gender head, we force
-    the model to verify this claim structurally. If gender accuracy is high,
-    it confirms that morphology encodes gender-relevant body structure.
-    If accuracy is low, it tells us the hypothesis needs revision.
-
-    Using the fused feature would let motion information bleed into
-    gender prediction, which would make the result uninterpretable.
-
-Why Fm' (post-graph) rather than Fm (pre-graph):
-    Fm' has received a small message from the motion branch (via alpha * Wm(Fk)).
-    Using Fm' rather than Fm means gender prediction is allowed to see
-    the very small motion context, but morphology is still the dominant signal.
-    This is a minor distinction — in practice, alpha is small and Fm' ≈ Fm.
-
-Architecture:
-    Fm' [B, 512]
-      │
-      FC 512→128
-      BN1D
-      ReLU
-      │
-      FC 128→2
-      │
-    Logits [B, 2]
-
-Note: No softmax here. CrossEntropyLoss in PyTorch expects raw logits.
-"""
-
 import torch.nn as nn
 
 
@@ -89,7 +45,7 @@ class GenderHead(nn.Module):
         point is consistent regardless of the global training seed.
         """
         import torch
-        with torch.random.fork_rng():
+        with torch.random.fork_rng(devices=[]):
             torch.manual_seed(0)   # fixed seed for gender head only
             for m in self.head:
                 if isinstance(m, nn.Linear):

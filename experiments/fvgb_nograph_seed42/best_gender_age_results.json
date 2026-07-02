@@ -1,0 +1,10 @@
+{
+  "gender_head_accuracy": 0.8611111044883728,
+  "gender_head_balanced_accuracy": 0.8625541125541125,
+  "gender_head_F1_Male": 0.8828125,
+  "gender_head_F1_Female": 0.8295454545454546,
+  "gender_eer": 0.365045942619472,
+  "linear_probe_Fm_gender": 0.9181818246841431,
+  "linear_probe_Fk_gender": 0.5909090995788574,
+  "disentanglement_gap_gender": 0.3272727251052857
+}

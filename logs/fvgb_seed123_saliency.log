@@ -1,0 +1,9 @@
+Device: cuda
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 100
+Saliency overlay saved to experiments/fvgb_seed123/plots/saliency_overlay_1.png
+Saliency overlay saved to experiments/fvgb_seed123/plots/saliency_overlay_2.png
+Saliency overlay saved to experiments/fvgb_seed123/plots/saliency_overlay_3.png
+Saliency overlay saved to experiments/fvgb_seed123/plots/saliency_overlay_4.png
+Saliency overlay saved to experiments/fvgb_seed123/plots/saliency_overlay_5.png

@@ -1,0 +1,42 @@
+Device: cuda
+Building dataloaders...
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 100
+Extracting features from val set...
+
+Val samples: 216
+Gender distribution: Male=132  Female=84
+
+=== Gender Head (Fm') ===
+  Accuracy:          81.94%
+  Balanced Accuracy: 84.36%
+  F1 Male:           83.26%  (P=96.0%  R=73.5%)
+  F1 Female:         80.40%  (P=69.6%  R=95.2%)
+
+=== Gender Verification EER (Fm') ===
+  EER: 37.43%  (threshold=0.0286)
+
+=== Linear Probe on Fm (morphology) ===
+Training linear probe (avg 5 seeds)... (expected HIGH accuracy)
+Linear probe accuracy on Fm: 90.91%
+
+=== Linear Probe on Fk (motion) ===
+Training linear probe (avg 5 seeds)... (expected ~50% if disentangled)
+Linear probe accuracy on Fk: 60.45%
+
+============================================================
+GENDER EVALUATION SUMMARY
+============================================================
+Metric                            Fm (head)   Fm (probe)   Fk (probe)
+------------------------------ ------------ ------------ ------------
+Accuracy                             81.94%       90.91%       60.45%
+Balanced Accuracy                    84.36%          N/A          N/A
+EER (Fm verification)                37.43%          N/A          N/A
+
+Disentanglement check (linear probe gap):
+  Linear probe Fm - Fk gap: 30.45%
+  PASSED -- morphology encodes gender more than motion does
+Gender confusion matrix saved to experiments/fvgb_seed789/plots/gender_confusion.png
+
+Results saved to experiments/fvgb_seed789/best_gender_age_results.json

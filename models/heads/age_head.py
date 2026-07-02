@@ -1,67 +1,3 @@
-"""
-age_head.py — Age Estimation Head (Classification + Regression)
-
-What this module does:
-    Takes Fm' [B, 512] — the morphology feature AFTER graph interaction —
-    and produces BOTH:
-        - age_bin_logits: [B, NUM_AGE_BINS]  classification over 7 bins
-        - age_value:      [B]                regression, raw years
-
-    Both heads from a SHARED trunk (512 -> hidden_dim), branching only at
-    the final layer. This is deliberate: classification and regression on
-    the same underlying attribute should share most of their representation
-    — splitting earlier would double the parameters for no clear benefit
-    and risks the two outputs drifting into inconsistent predictions
-    (e.g. classifying "child" while regressing to age 45).
-
-Why Fm' and NOT the fused feature (same rationale as gender_head.py):
-    Age, like gender, is treated in this architecture as a property of
-    body shape/morphology rather than dynamic gait pattern. Routing only
-    the morphology branch to the age head keeps the disentanglement story
-    consistent: Fm' = static person attributes (shape, gender, age),
-    Fk' = dynamic gait pattern feeding identity.
-
-    Note: gait dynamics genuinely do correlate with age (cadence, stride
-    length change with age) — supervising age only on Fm' does not erase
-    that correlation from Fk, it simply means the age LOSS does not
-    directly optimise Fk to encode it. This is an acknowledged simplification,
-    consistent with how gender supervision is handled, and should be stated
-    plainly in the paper rather than overclaimed.
-
-Conditional instantiation:
-    This head is only ever constructed when DatasetMeta.has_age is True
-    (see model factory in biokinematic_net.py). It does not exist in the
-    model graph at all for datasets without age labels (e.g. FVG-B) —
-    no dead parameters, nothing to explain away in an ablation table.
-
-Partial-label handling (OU-LP-Bag specific):
-    Even when has_age=True for a dataset, INDIVIDUAL samples within a
-    batch may still have age_label=None (only the OULP-Age intersection
-    subset of OU-LP-Bag subjects is age-labeled). This head always
-    produces a prediction for every sample in the batch — masking out
-    the unlabeled samples for loss computation is the responsibility of
-    the loss function (losses/combined_loss.py), not this head. The head
-    itself has no concept of "missing labels" — it simply predicts.
-
-Architecture:
-    Fm' [B, 512]
-      |
-      FC 512->256
-      BN1D
-      ReLU
-      Dropout(0.3)
-      |
-      +---- FC 256->NUM_AGE_BINS  ----> age_bin_logits [B, NUM_AGE_BINS]
-      |
-      +---- FC 256->1 (+ softplus) ---> age_value [B]  (raw years, >=0)
-
-Note on the regression output:
-    A softplus activation is applied to the final regression scalar to
-    guarantee non-negative age predictions (age cannot be negative; a raw
-    linear output could predict e.g. -3.2 years early in training, which
-    is nonsensical and can destabilise the L1 loss gradient).
-"""
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -106,7 +42,7 @@ class AgeHead(nn.Module):
         is liable to the same failure mode, so the fix is applied from
         the start rather than waiting to rediscover the same bug.
         """
-        with torch.random.fork_rng():
+        with torch.random.fork_rng(devices=[]):
             torch.manual_seed(0)
             for module in [self.trunk, self.classifier, self.regressor]:
                 for m in module.modules() if hasattr(module, 'modules') else [module]:

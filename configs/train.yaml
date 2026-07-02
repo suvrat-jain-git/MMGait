@@ -13,7 +13,7 @@ training:
 
   scheduler:
     name: CosineAnnealingLR
-    T_max: 100              # Matches epochs
+    T_max: 150              # Matches epochs
     eta_min: 0.000001
 
   # --- Loss Weights ---

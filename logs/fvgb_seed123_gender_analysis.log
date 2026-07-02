@@ -1,0 +1,50 @@
+Device: cuda
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 100
+
+Extracting features from val set...
+
+============================================================
+GENDER FEATURE ANALYSIS
+============================================================
+
+1. Fisher Discriminant Ratio (gender separability)
+   Fm FDR: 0.2000  (higher = more gender-discriminative)
+   Fk FDR: 0.0394
+   Ratio Fm/Fk: 5.07x
+   PASSED -- Fm is more gender-discriminative than Fk
+
+2. Intra/Inter-class Gender Distances
+   Fm: intra=0.0298  inter=0.0359  ratio=1.20x
+   Fk: intra=0.0030  inter=0.0031  ratio=1.04x
+
+3. Top 10 Gender-Discriminative Dimensions of Fm
+   Dimension indices: [109, 406, 236, 219, 85, 15, 277, 305, 476, 482]
+   Max diff: 0.1372  Min diff (top 10): 0.0898
+
+4. Per-Subject Gender Accuracy (val set)
+   Subjects with 100% correct: 6/18
+   Subjects with 0% correct:   0/18
+
+   Per-subject breakdown:
+   Subject    64 (F): [########..] 83%
+   Subject    71 (F): [##########] 100%
+   Subject    73 (F): [########..] 83%
+   Subject    76 (F): [##########] 100%
+   Subject    79 (M): [##########] 100%
+   Subject    80 (M): [#######...] 75%
+   Subject    81 (M): [########..] 83%
+   Subject    82 (M): [##########] 100%
+   Subject    83 (F): [##########] 100%
+   Subject    84 (M): [#######...] 75%
+   Subject    85 (M): [########..] 83%
+   Subject    86 (M): [#########.] 92%
+   Subject   130 (F): [##........] 25%
+   Subject   131 (M): [#########.] 92%
+   Subject   132 (M): [#######...] 75%
+   Subject   133 (M): [####......] 42%
+   Subject   134 (F): [##########] 100%
+   Subject   135 (M): [#########.] 92%
+
+Results saved to experiments/fvgb_seed123/best_gender_analysis.json

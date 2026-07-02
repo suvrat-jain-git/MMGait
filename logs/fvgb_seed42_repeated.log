@@ -1,0 +1,28 @@
+Device: cuda
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 110
+
+=== Repeated Frame Test (Static Sequence, protocol: WS) ===
+
+Extracting original features...
+Extracting static (repeated frame) features...
+
+============================================================
+REPEATED FRAME TEST RESULTS
+============================================================
+Metric                                     Original     Static
+---------------------------------------- ---------- ----------
+WS Rank-1                                    73.33%     19.33%
+WS mAP                                       80.54%     31.18%
+Fm feature norm                              7.4330     7.9295
+Fk feature norm                              6.2942     6.2747
+Fm cosine sim (orig vs static)                   --     0.9719
+Fk cosine sim (orig vs static)                   --     0.9941
+
+Interpretation:
+  Fk norm drop: 0.3%  Fm norm drop: -6.7%
+  ~ Fm and Fk show similar response to static input.
+  Rank-1 drop: 54.00%
+
+Results saved to experiments/fvgb_seed42/best_repeated_frame_test.json

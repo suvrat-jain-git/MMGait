@@ -1,0 +1,10 @@
+{
+  "protocol": "WS",
+  "r1_original": 0.7333333333333333,
+  "r1_shuffled": 0.6924444444444445,
+  "map_original": 0.8103391597033555,
+  "map_shuffled": 0.7798544860244357,
+  "fm_cosine_sim": 1.0,
+  "fk_cosine_sim": 0.9952621579170227,
+  "rank1_drop": 0.04088888888888875
+}

@@ -1,0 +1,7 @@
+{
+  "protocol": "WS",
+  "fm_fk_cosine_sim_mean": 0.9706156849861145,
+  "fm_fk_cosine_sim_std": 0.004855856765061617,
+  "r2_fk_to_fm": 0.9378051161766052,
+  "r2_fm_to_fk": 1.0
+}

@@ -1,0 +1,14 @@
+{
+  "protocol": "WS",
+  "r1_original": 0.7333333333333333,
+  "r1_static": 0.17333333333333334,
+  "map_original": 0.8103391597033555,
+  "map_static": 0.2973571047759372,
+  "fm_norm_original": 7.398279190063477,
+  "fm_norm_static": 8.107507705688477,
+  "fk_norm_original": 6.550321578979492,
+  "fk_norm_static": 6.468127250671387,
+  "fm_cosine_sim": 0.9681016802787781,
+  "fk_cosine_sim": 0.9943337440490723,
+  "rank1_drop": 0.5599999999999999
+}

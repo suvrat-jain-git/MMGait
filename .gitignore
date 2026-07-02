@@ -1,0 +1,31 @@
+# Checkpoints -- too large for git
+experiments/**/*.pth
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+
+# Conda/pip env
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Temp files
+*.tmp
+*.temp

@@ -1,0 +1,39 @@
+Device: cuda
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 110
+
+Extracting val features...
+
+============================================================
+CROSS-BRANCH FEATURE SIMILARITY
+============================================================
+
+1. Fm vs Fk Cosine Similarity Distribution
+   Mean:   0.9740  (0=orthogonal, 1=identical, -1=opposite)
+   Std:    0.0046
+   Min:    0.9574
+   Max:    0.9821
+   % near-orthogonal (|sim|<0.1): 0.0%
+   Pre-graph  Fm  vs Fk:  mean=0.9740  (BT loss applied here)
+   Post-graph Fm' vs Fk': mean=0.9701  (after graph mixing)
+   Graph mixing increases similarity by: -0.0039
+
+2. Fm vs Fk Similarity by Gender
+   Male: mean similarity = 0.9743
+   Female: mean similarity = 0.9735
+
+3. Cross-Branch Linear Predictability (R^2)
+   Testing: can Fk linearly predict Fm (and vice versa)?
+   (R^2 near 0 = branches are independent)
+   R^2 (Fk -> Fm): 0.9612
+   R^2 (Fm -> Fk): 1.0000
+   FAILED -- high R^2, branches share significant information
+
+4. Per-Sequence Orthogonality vs Retrieval Performance
+   Computing per-sequence Rank-1 on WS probe...
+   Correlation (Fm.Fk similarity vs Rank-1 correct): 0.0526
+   Mean sim (correct retrievals):   0.9747
+   Mean sim (incorrect retrievals): 0.9742
+
+Results saved to experiments/fvgb_seed42/best_feature_similarity.json

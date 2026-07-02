@@ -1,0 +1,73 @@
+Device: cuda
+Building dataloaders...
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 130
+
+============================================================
+Protocol Evaluation (fvgb, all test subjects as gallery)
+============================================================
+
+[WS]
+  Extracting gallery embeddings...
+  Extracting probe embeddings...
+  Gallery sequences: 90  Probe sequences: 450
+  Gallery subjects: 90
+  Rank-1: 73.33%
+  Rank-5: 90.22%
+  mAP:    81.03%
+  EER:    8.45%  (threshold=0.0642)
+
+[BGHT]
+  Extracting gallery embeddings...
+  Extracting probe embeddings...
+  Gallery sequences: 60  Probe sequences: 180
+  Gallery subjects: 60
+  Rank-1: 53.89%
+  Rank-5: 79.44%
+  mAP:    65.11%
+  EER:    14.83%  (threshold=0.0686)
+
+[CL]
+  Extracting gallery embeddings...
+  Extracting probe embeddings...
+  Gallery sequences: 30  Probe sequences: 90
+  Gallery subjects: 30
+  Rank-1: 58.89%
+  Rank-5: 91.11%
+  mAP:    71.77%
+  EER:    16.40%  (threshold=0.0726)
+
+[MP]
+  Extracting gallery embeddings...
+  Extracting probe embeddings...
+  Gallery sequences: 30  Probe sequences: 90
+  Gallery subjects: 30
+  Rank-1: 84.44%
+  Rank-5: 96.67%
+  mAP:    90.42%
+  EER:    6.65%  (threshold=0.0589)
+
+[ALL]
+  Extracting gallery embeddings...
+  Extracting probe embeddings...
+  Gallery sequences: 90  Probe sequences: 1134
+  Gallery subjects: 90
+  Rank-1: 62.17%
+  Rank-5: 83.95%
+  mAP:    71.79%
+  EER:    11.51%  (threshold=0.0691)
+
+======================================================================
+RESULTS SUMMARY
+======================================================================
+Protocol     Rank-1   Rank-5      mAP      EER  N_probe  N_gallery
+---------- -------- -------- -------- -------- -------- ----------
+WS           73.33%   90.22%   81.03%    8.45%      450         90
+BGHT         53.89%   79.44%   65.11%   14.83%      180         60
+CL           58.89%   91.11%   71.77%   16.40%       90         30
+MP           84.44%   96.67%   90.42%    6.65%       90         30
+ALL          62.17%   83.95%   71.79%   11.51%     1134         90
+CMC curves saved to experiments/fvgb_seed2024/plots/cmc_curves.png
+
+Results saved to experiments/fvgb_seed2024/best_gait_results.json

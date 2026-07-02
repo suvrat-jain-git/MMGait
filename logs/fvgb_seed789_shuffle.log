@@ -1,0 +1,30 @@
+Device: cuda
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 100
+
+=== Frame Shuffle Test (protocol: WS) ===
+Averaging over 5 shuffle permutations
+
+Extracting original features...
+Original  -- Rank-1: 75.78%  mAP: 82.80%
+Shuffled  -- Rank-1: 71.33%  mAP: 79.81%
+
+=======================================================
+SHUFFLE SENSITIVITY
+=======================================================
+Metric                                Original   Shuffled
+----------------------------------- ---------- ----------
+WS Rank-1                               75.78%     71.33%
+WS mAP                                  82.80%     79.81%
+Fm cosine sim (orig vs shuf)                --     1.0000
+Fk cosine sim (orig vs shuf)                --     0.9968
+
+Interpretation:
+  ~ Fk (0.997) approx Fm (1.000)
+    Both branches show similar shuffle sensitivity.
+
+  Rank-1 drop from shuffling: 4.44%
+  ~ Retrieval is relatively robust to frame shuffling.
+
+Results saved to experiments/fvgb_seed789/best_shuffle_test.json
