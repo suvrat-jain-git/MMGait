@@ -57,6 +57,10 @@ def parse_args():
                         help='Disable the Bio-Kinematic Graph (ablation): '
                              'Fm and Fk pass straight through with no '
                              'cross-branch interaction at all')
+    parser.add_argument('--no_barlow', action='store_true',
+                        help='Disable Barlow Twins disentanglement loss '
+                             '(sets w_orthogonality=0.0). Used for the '
+                             'No-Barlow-Twins ablation.')
     parser.add_argument('--save_dir', default=None,
                         help='Override checkpoint save directory from config. '
                              'Use this when running multiple seeds in parallel '
@@ -88,6 +92,10 @@ def main():
 
     if args.save_dir is not None:
         cfg['training']['checkpoint']['save_dir'] = args.save_dir
+
+    if args.no_barlow:
+        cfg['training']['loss_weights']['orthogonality'] = 0.0
+        print("Barlow Twins loss DISABLED (w_orthogonality=0.0)")
 
     # -- Reproducibility --------------------------------------------------
     seed = args.seed

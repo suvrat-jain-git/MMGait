@@ -1,0 +1,827 @@
+Barlow Twins loss DISABLED (w_orthogonality=0.0)
+Dataset: fvgb
+Seed: 789
+Graph: enabled
+Morphology backbone: custom
+Device: cuda
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+
+DatasetMeta: name=fvgb  has_gender=True  has_age=False
+Training identities: 136
+Train batches:       11
+Val batches:         14
+Test subjects:       90
+  WS: gallery=90  probe=450
+  BGHT: gallery=60  probe=180
+  CL: gallery=30  probe=90
+  MP: gallery=30  probe=90
+  ALL: gallery=90  probe=1134
+
+Parameter breakdown:
+  morph_encoder (custom)  1,568,992
+  motion_encoder        4,703,008
+  identity_head           595,456
+  graph                   525,313
+  gender_head              66,178
+  total                 7,458,947
+
+Starting training from epoch 1 to 150
+
+
+Epoch 001/150 Summary | LR=0.000300
+  Train — total=3.6897  id=5.1093  tri=0.7384  orth=0.638995  gen=0.7934
+  Val   — total=3.4192  id=4.9152  tri=0.6154  gen=0.6922  gen_acc=0.389
+
+
+Epoch 002/150 Summary | LR=0.000300
+  Train — total=3.2810  id=4.6570  tri=0.6765  orth=0.899784  gen=0.5521
+  Val   — total=3.7544  id=4.9341  tri=0.6410  gen=1.2927  gen_acc=0.389
+
+
+Epoch 003/150 Summary | LR=0.000300
+  Train — total=2.9740  id=4.3150  tri=0.6400  orth=0.856522  gen=0.3531
+  Val   — total=3.7062  id=4.9504  tri=0.6576  gen=1.1469  gen_acc=0.389
+
+
+Epoch 004/150 Summary | LR=0.000299
+  Train — total=2.8356  id=4.0416  tri=0.6161  orth=0.908472  gen=0.3975
+  Val   — total=3.7180  id=4.9333  tri=0.6808  gen=1.1412  gen_acc=0.389
+
+
+Epoch 005/150 Summary | LR=0.000299
+  Train — total=2.7443  id=3.9085  tri=0.5918  orth=0.906002  gen=0.3963
+  Val   — total=4.6397  id=5.0850  tri=0.6911  gen=2.8122  gen_acc=0.389
+
+
+Epoch 006/150 Summary | LR=0.000299
+  Train — total=2.6947  id=3.8107  tri=0.6135  orth=0.771914  gen=0.3516
+  Val   — total=4.0375  id=5.2221  tri=0.6979  gen=1.4571  gen_acc=0.394
+
+
+Epoch 007/150 Summary | LR=0.000298
+  Train — total=2.6140  id=3.6279  tri=0.6111  orth=0.565424  gen=0.3779
+  Val   — total=4.5391  id=5.7352  tri=0.6857  gen=1.9716  gen_acc=0.389
+
+
+Epoch 008/150 Summary | LR=0.000298
+  Train — total=2.4131  id=3.4151  tri=0.5692  orth=0.626629  gen=0.2727
+  Val   — total=4.6119  id=6.8500  tri=0.7191  gen=0.9356  gen_acc=0.495
+
+
+Epoch 009/150 Summary | LR=0.000297
+  Train — total=2.4140  id=3.3123  tri=0.5733  orth=0.567283  gen=0.3690
+  Val   — total=4.9310  id=7.7567  tri=0.7067  gen=0.6919  gen_acc=0.639
+
+
+Epoch 010/150 Summary | LR=0.000297
+  Train — total=2.3611  id=3.2630  tri=0.5841  orth=0.529011  gen=0.2910
+  Val   — total=5.2218  id=8.5166  tri=0.7100  gen=0.5070  gen_acc=0.773
+
+  WS Rank-1 (epoch 10): 49.56%
+Best checkpoint saved (Rank-1=49.56%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_010.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=5.2218)
+
+Epoch 011/150 Summary | LR=0.000296
+  Train — total=2.3567  id=3.2242  tri=0.5687  orth=0.655132  gen=0.3519
+  Val   — total=6.7644  id=10.3741  tri=0.7165  gen=1.7215  gen_acc=0.394
+
+
+Epoch 012/150 Summary | LR=0.000295
+  Train — total=2.0918  id=2.8329  tri=0.5442  orth=0.692627  gen=0.2622
+  Val   — total=4.3785  id=6.6515  tri=0.7157  gen=0.6741  gen_acc=0.662
+
+
+Epoch 013/150 Summary | LR=0.000294
+  Train — total=2.1250  id=2.8879  tri=0.5518  orth=0.475176  gen=0.2585
+  Val   — total=4.3326  id=6.8428  tri=0.7050  gen=0.4124  gen_acc=0.782
+
+
+Epoch 014/150 Summary | LR=0.000294
+  Train — total=2.0759  id=2.7632  tri=0.5614  orth=0.474378  gen=0.2658
+  Val   — total=4.3389  id=6.9492  tri=0.6974  gen=0.3339  gen_acc=0.829
+
+
+Epoch 015/150 Summary | LR=0.000293
+  Train — total=2.0411  id=2.6921  tri=0.5547  orth=0.420851  gen=0.2808
+  Val   — total=4.5491  id=6.7752  tri=0.6911  gen=0.9409  gen_acc=0.523
+
+
+Epoch 016/150 Summary | LR=0.000292
+  Train — total=1.9913  id=2.6434  tri=0.5517  orth=0.473085  gen=0.2357
+  Val   — total=5.0424  id=8.0667  tri=0.6939  gen=0.6302  gen_acc=0.639
+
+
+Epoch 017/150 Summary | LR=0.000291
+  Train — total=1.8911  id=2.4564  tri=0.5404  orth=0.495454  gen=0.2450
+  Val   — total=4.9845  id=7.9564  tri=0.7080  gen=0.5968  gen_acc=0.685
+
+
+Epoch 018/150 Summary | LR=0.000290
+  Train — total=1.8284  id=2.3388  tri=0.5336  orth=0.442157  gen=0.2509
+  Val   — total=4.8284  id=7.6888  tri=0.7028  gen=0.5624  gen_acc=0.731
+
+
+Epoch 019/150 Summary | LR=0.000288
+  Train — total=1.8539  id=2.3588  tri=0.5471  orth=0.427087  gen=0.2547
+  Val   — total=4.4048  id=6.8256  tri=0.7186  gen=0.5468  gen_acc=0.796
+
+
+Epoch 020/150 Summary | LR=0.000287
+  Train — total=1.8827  id=2.3904  tri=0.5519  orth=0.368626  gen=0.2712
+  Val   — total=6.9672  id=9.1153  tri=0.7033  gen=3.4125  gen_acc=0.389
+
+  WS Rank-1 (epoch 20): 52.67%
+Best checkpoint saved (Rank-1=52.67%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_020.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=6.9672)
+
+Epoch 021/150 Summary | LR=0.000286
+  Train — total=1.7047  id=2.1505  tri=0.5324  orth=0.416834  gen=0.1942
+  Val   — total=5.0602  id=7.8136  tri=0.7105  gen=0.8857  gen_acc=0.560
+
+
+Epoch 022/150 Summary | LR=0.000284
+  Train — total=1.7483  id=2.2102  tri=0.5369  orth=0.370984  gen=0.2127
+  Val   — total=5.0708  id=7.6254  tri=0.7013  gen=1.1137  gen_acc=0.574
+
+
+Epoch 023/150 Summary | LR=0.000283
+  Train — total=1.6583  id=2.0486  tri=0.5341  orth=0.371083  gen=0.1998
+  Val   — total=5.3727  id=7.9024  tri=0.6995  gen=1.4441  gen_acc=0.736
+
+
+Epoch 024/150 Summary | LR=0.000282
+  Train — total=1.6330  id=1.9876  tri=0.5314  orth=0.379090  gen=0.2157
+  Val   — total=5.4828  id=9.0292  tri=0.6903  gen=0.5559  gen_acc=0.773
+
+
+Epoch 025/150 Summary | LR=0.000280
+  Train — total=1.5297  id=1.8637  tri=0.5160  orth=0.356247  gen=0.1637
+  Val   — total=5.9199  id=8.5752  tri=0.6953  gen=1.8739  gen_acc=0.454
+
+
+Epoch 026/150 Summary | LR=0.000278
+  Train — total=1.6073  id=1.9503  tri=0.5212  orth=0.409026  gen=0.2219
+  Val   — total=6.2280  id=9.0137  tri=0.7055  gen=2.0312  gen_acc=0.407
+
+
+Epoch 027/150 Summary | LR=0.000277
+  Train — total=1.5761  id=1.9118  tri=0.5273  orth=0.360676  gen=0.1857
+  Val   — total=5.7137  id=9.2554  tri=0.6967  gen=0.7787  gen_acc=0.574
+
+
+Epoch 028/150 Summary | LR=0.000275
+  Train — total=1.5104  id=1.7883  tri=0.5237  orth=0.297637  gen=0.1851
+  Val   — total=5.1994  id=8.6187  tri=0.6740  gen=0.4322  gen_acc=0.759
+
+
+Epoch 029/150 Summary | LR=0.000273
+  Train — total=1.4773  id=1.7626  tri=0.5171  orth=0.301723  gen=0.1578
+  Val   — total=4.4976  id=6.7410  tri=0.6924  gen=0.8694  gen_acc=0.616
+
+
+Epoch 030/150 Summary | LR=0.000271
+  Train — total=1.4836  id=1.7220  tri=0.5303  orth=0.282648  gen=0.1846
+  Val   — total=6.2759  id=9.1708  tri=0.7027  gen=1.9755  gen_acc=0.741
+
+  WS Rank-1 (epoch 30): 62.22%
+Best checkpoint saved (Rank-1=62.22%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_030.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=6.2759)
+
+Epoch 031/150 Summary | LR=0.000270
+  Train — total=1.4444  id=1.6926  tri=0.5195  orth=0.363388  gen=0.1572
+  Val   — total=4.6775  id=7.5037  tri=0.6852  gen=0.4811  gen_acc=0.759
+
+
+Epoch 032/150 Summary | LR=0.000268
+  Train — total=1.4904  id=1.7373  tri=0.5226  orth=0.373574  gen=0.1982
+  Val   — total=4.9266  id=7.7718  tri=0.6895  gen=0.7023  gen_acc=0.606
+
+
+Epoch 033/150 Summary | LR=0.000266
+  Train — total=1.4118  id=1.6367  tri=0.5129  orth=0.351489  gen=0.1610
+  Val   — total=5.1984  id=8.2237  tri=0.6879  gen=0.7974  gen_acc=0.593
+
+
+Epoch 034/150 Summary | LR=0.000264
+  Train — total=1.2946  id=1.4215  tri=0.4963  orth=0.361557  gen=0.1749
+  Val   — total=5.8929  id=9.9515  tri=0.6731  gen=0.4880  gen_acc=0.731
+
+
+Epoch 035/150 Summary | LR=0.000262
+  Train — total=1.2939  id=1.4437  tri=0.5015  orth=0.319100  gen=0.1410
+  Val   — total=5.6948  id=9.0029  tri=0.6849  gen=1.0169  gen_acc=0.486
+
+
+Epoch 036/150 Summary | LR=0.000259
+  Train — total=1.3277  id=1.4649  tri=0.5007  orth=0.310195  gen=0.1891
+  Val   — total=5.8733  id=9.8410  tri=0.6820  gen=0.5415  gen_acc=0.819
+
+
+Epoch 037/150 Summary | LR=0.000257
+  Train — total=1.2285  id=1.3290  tri=0.4949  orth=0.328965  gen=0.1382
+  Val   — total=5.0828  id=8.3890  tri=0.6815  gen=0.4135  gen_acc=0.852
+
+
+Epoch 038/150 Summary | LR=0.000255
+  Train — total=1.2708  id=1.3555  tri=0.5142  orth=0.312593  gen=0.1577
+  Val   — total=4.9419  id=7.9646  tri=0.6825  gen=0.5541  gen_acc=0.745
+
+
+Epoch 039/150 Summary | LR=0.000253
+  Train — total=1.2909  id=1.4511  tri=0.4973  orth=0.295631  gen=0.1360
+  Val   — total=4.4986  id=7.1373  tri=0.7002  gen=0.4596  gen_acc=0.782
+
+
+Epoch 040/150 Summary | LR=0.000251
+  Train — total=1.1857  id=1.2571  tri=0.4942  orth=0.311564  gen=0.1261
+  Val   — total=5.0816  id=8.1701  tri=0.6903  gen=0.6126  gen_acc=0.727
+
+  WS Rank-1 (epoch 40): 68.22%
+Best checkpoint saved (Rank-1=68.22%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_040.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=5.0816)
+
+Epoch 041/150 Summary | LR=0.000248
+  Train — total=1.2036  id=1.2478  tri=0.4996  orth=0.275624  gen=0.1603
+  Val   — total=4.7324  id=7.6385  tri=0.6767  gen=0.4728  gen_acc=0.764
+
+
+Epoch 042/150 Summary | LR=0.000246
+  Train — total=1.1381  id=1.1519  tri=0.4842  orth=0.316793  gen=0.1558
+  Val   — total=5.1040  id=8.4027  tri=0.6802  gen=0.4449  gen_acc=0.764
+
+
+Epoch 043/150 Summary | LR=0.000243
+  Train — total=1.1424  id=1.1874  tri=0.4895  orth=0.318351  gen=0.1186
+  Val   — total=5.1152  id=8.1017  tri=0.6753  gen=0.7781  gen_acc=0.810
+
+
+Epoch 044/150 Summary | LR=0.000241
+  Train — total=1.0635  id=1.0513  tri=0.4691  orth=0.291349  gen=0.1375
+  Val   — total=4.7856  id=7.5690  tri=0.6829  gen=0.6364  gen_acc=0.676
+
+
+Epoch 045/150 Summary | LR=0.000238
+  Train — total=1.1071  id=1.1156  tri=0.4837  orth=0.302321  gen=0.1312
+  Val   — total=5.0082  id=7.9414  tri=0.6897  gen=0.6956  gen_acc=0.824
+
+
+Epoch 046/150 Summary | LR=0.000236
+  Train — total=1.1357  id=1.1785  tri=0.4871  orth=0.297090  gen=0.1186
+  Val   — total=5.7741  id=8.8714  tri=0.6901  gen=1.2966  gen_acc=0.500
+
+
+Epoch 047/150 Summary | LR=0.000233
+  Train — total=1.1372  id=1.1478  tri=0.4801  orth=0.307407  gen=0.1664
+  Val   — total=5.6862  id=9.3813  tri=0.6796  gen=0.6317  gen_acc=0.653
+
+
+Epoch 048/150 Summary | LR=0.000231
+  Train — total=1.0202  id=0.9705  tri=0.4728  orth=0.290541  gen=0.1242
+  Val   — total=4.8130  id=7.8465  tri=0.6960  gen=0.3875  gen_acc=0.866
+
+
+Epoch 049/150 Summary | LR=0.000228
+  Train — total=0.9943  id=0.9620  tri=0.4715  orth=0.276598  gen=0.0836
+  Val   — total=4.7206  id=7.4442  tri=0.6947  gen=0.6076  gen_acc=0.690
+
+
+Epoch 050/150 Summary | LR=0.000225
+  Train — total=0.9900  id=0.9474  tri=0.4718  orth=0.276398  gen=0.0892
+  Val   — total=5.3487  id=8.8848  tri=0.6881  gen=0.4365  gen_acc=0.810
+
+  WS Rank-1 (epoch 50): 67.78%
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_050.pth
+
+Epoch 051/150 Summary | LR=0.000223
+  Train — total=1.0533  id=1.0795  tri=0.4656  orth=0.263387  gen=0.0961
+  Val   — total=5.0413  id=8.2081  tri=0.6944  gen=0.4857  gen_acc=0.810
+
+
+Epoch 052/150 Summary | LR=0.000220
+  Train — total=1.0169  id=0.9543  tri=0.4787  orth=0.270767  gen=0.1222
+  Val   — total=4.9529  id=8.0501  tri=0.6996  gen=0.4565  gen_acc=0.773
+
+
+Epoch 053/150 Summary | LR=0.000217
+  Train — total=0.9597  id=0.8893  tri=0.4550  orth=0.294644  gen=0.1202
+  Val   — total=4.7968  id=7.3865  tri=0.6853  gen=0.8365  gen_acc=0.625
+
+
+Epoch 054/150 Summary | LR=0.000214
+  Train — total=0.9677  id=0.8892  tri=0.4579  orth=0.274365  gen=0.1304
+  Val   — total=5.6483  id=7.8577  tri=0.7002  gen=2.0384  gen_acc=0.398
+
+
+Epoch 055/150 Summary | LR=0.000211
+  Train — total=0.9822  id=0.9267  tri=0.4668  orth=0.288571  gen=0.1041
+  Val   — total=6.0144  id=8.2755  tri=0.6826  gen=2.3881  gen_acc=0.389
+
+
+Epoch 056/150 Summary | LR=0.000208
+  Train — total=0.8921  id=0.7760  tri=0.4514  orth=0.251335  gen=0.1052
+  Val   — total=5.1051  id=8.2686  tri=0.6949  gen=0.5518  gen_acc=0.731
+
+
+Epoch 057/150 Summary | LR=0.000206
+  Train — total=0.9330  id=0.8495  tri=0.4564  orth=0.284134  gen=0.1036
+  Val   — total=5.5146  id=8.0602  tri=0.7024  gen=1.5643  gen_acc=0.718
+
+
+Epoch 058/150 Summary | LR=0.000203
+  Train — total=0.9375  id=0.8349  tri=0.4596  orth=0.271987  gen=0.1209
+  Val   — total=5.1253  id=8.0010  tri=0.7025  gen=0.8447  gen_acc=0.792
+
+
+Epoch 059/150 Summary | LR=0.000200
+  Train — total=0.9056  id=0.7867  tri=0.4557  orth=0.257734  gen=0.1130
+  Val   — total=5.3020  id=8.6479  tri=0.7009  gen=0.5542  gen_acc=0.722
+
+
+Epoch 060/150 Summary | LR=0.000197
+  Train — total=1.0077  id=0.9550  tri=0.4682  orth=0.247640  gen=0.1240
+  Val   — total=5.2601  id=8.4085  tri=0.7022  gen=0.7073  gen_acc=0.829
+
+  WS Rank-1 (epoch 60): 70.67%
+Best checkpoint saved (Rank-1=70.67%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_060.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=5.2601)
+
+Epoch 061/150 Summary | LR=0.000194
+  Train — total=0.8302  id=0.6948  tri=0.4476  orth=0.293391  gen=0.0704
+  Val   — total=5.3501  id=8.6602  tri=0.6865  gen=0.6670  gen_acc=0.852
+
+
+Epoch 062/150 Summary | LR=0.000191
+  Train — total=0.8610  id=0.7634  tri=0.4377  orth=0.293067  gen=0.0831
+  Val   — total=4.7270  id=7.6816  tri=0.6897  gen=0.3930  gen_acc=0.829
+
+
+Epoch 063/150 Summary | LR=0.000188
+  Train — total=0.8844  id=0.7882  tri=0.4488  orth=0.258902  gen=0.0831
+  Val   — total=5.2221  id=7.7663  tri=0.7013  gen=1.2755  gen_acc=0.463
+
+
+Epoch 064/150 Summary | LR=0.000185
+  Train — total=0.9057  id=0.7838  tri=0.4607  orth=0.233876  gen=0.1062
+  Val   — total=5.3683  id=8.5988  tri=0.7058  gen=0.7263  gen_acc=0.611
+
+
+Epoch 065/150 Summary | LR=0.000182
+  Train — total=0.9201  id=0.7851  tri=0.4704  orth=0.242952  gen=0.1143
+  Val   — total=5.7620  id=9.5678  tri=0.6901  gen=0.5761  gen_acc=0.852
+
+
+Epoch 066/150 Summary | LR=0.000179
+  Train — total=0.8738  id=0.7633  tri=0.4475  orth=0.272038  gen=0.0892
+  Val   — total=4.9595  id=8.0972  tri=0.6890  gen=0.4439  gen_acc=0.870
+
+
+Epoch 067/150 Summary | LR=0.000175
+  Train — total=0.8532  id=0.6891  tri=0.4611  orth=0.298568  gen=0.0950
+  Val   — total=5.4781  id=8.9034  tri=0.6900  gen=0.6729  gen_acc=0.778
+
+
+Epoch 068/150 Summary | LR=0.000172
+  Train — total=0.7788  id=0.5946  tri=0.4246  orth=0.260833  gen=0.1137
+  Val   — total=5.4463  id=8.8133  tri=0.6941  gen=0.6910  gen_acc=0.699
+
+
+Epoch 069/150 Summary | LR=0.000169
+  Train — total=0.8346  id=0.6982  tri=0.4318  orth=0.256832  gen=0.1072
+  Val   — total=5.5144  id=8.4234  tri=0.6979  gen=1.2097  gen_acc=0.532
+
+
+Epoch 070/150 Summary | LR=0.000166
+  Train — total=0.7957  id=0.6542  tri=0.4330  orth=0.250547  gen=0.0710
+  Val   — total=4.4700  id=7.1642  tri=0.6942  gen=0.3873  gen_acc=0.829
+
+  WS Rank-1 (epoch 70): 70.00%
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_070.pth
+
+Epoch 071/150 Summary | LR=0.000163
+  Train — total=0.7928  id=0.6397  tri=0.4259  orth=0.264599  gen=0.0942
+  Val   — total=4.8801  id=7.8949  tri=0.7058  gen=0.4537  gen_acc=0.829
+
+
+Epoch 072/150 Summary | LR=0.000160
+  Train — total=0.7855  id=0.6410  tri=0.4273  orth=0.268618  gen=0.0756
+  Val   — total=4.9499  id=8.1124  tri=0.7000  gen=0.3873  gen_acc=0.861
+
+
+Epoch 073/150 Summary | LR=0.000157
+  Train — total=0.8301  id=0.6733  tri=0.4447  orth=0.247721  gen=0.0974
+  Val   — total=4.7366  id=7.6398  tri=0.7071  gen=0.4191  gen_acc=0.810
+
+
+Epoch 074/150 Summary | LR=0.000154
+  Train — total=0.7280  id=0.5410  tri=0.4153  orth=0.263349  gen=0.0843
+  Val   — total=4.8237  id=7.8340  tri=0.7069  gen=0.3997  gen_acc=0.810
+
+
+Epoch 075/150 Summary | LR=0.000150
+  Train — total=0.7486  id=0.5964  tri=0.4139  orth=0.269714  gen=0.0730
+  Val   — total=5.2050  id=8.5910  tri=0.7213  gen=0.3763  gen_acc=0.861
+
+
+Epoch 076/150 Summary | LR=0.000147
+  Train — total=0.7406  id=0.6107  tri=0.4049  orth=0.250274  gen=0.0608
+  Val   — total=4.9589  id=7.9293  tri=0.7185  gen=0.5516  gen_acc=0.778
+
+
+Epoch 077/150 Summary | LR=0.000144
+  Train — total=0.7296  id=0.5787  tri=0.3988  orth=0.305119  gen=0.0829
+  Val   — total=4.8623  id=7.7146  tri=0.7025  gen=0.6050  gen_acc=0.736
+
+
+Epoch 078/150 Summary | LR=0.000141
+  Train — total=0.7506  id=0.6027  tri=0.4143  orth=0.251113  gen=0.0700
+  Val   — total=4.6025  id=7.3214  tri=0.7139  gen=0.4559  gen_acc=0.810
+
+
+Epoch 079/150 Summary | LR=0.000138
+  Train — total=0.7712  id=0.6129  tri=0.4279  orth=0.235138  gen=0.0737
+  Val   — total=5.2081  id=8.4459  tri=0.7280  gen=0.5143  gen_acc=0.759
+
+
+Epoch 080/150 Summary | LR=0.000135
+  Train — total=0.7008  id=0.5360  tri=0.4017  orth=0.247860  gen=0.0623
+  Val   — total=4.6683  id=7.4124  tri=0.7213  gen=0.4817  gen_acc=0.852
+
+  WS Rank-1 (epoch 80): 70.22%
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_080.pth
+
+Epoch 081/150 Summary | LR=0.000132
+  Train — total=0.7437  id=0.5658  tri=0.4206  orth=0.269476  gen=0.0804
+  Val   — total=4.9624  id=8.0414  tri=0.6975  gen=0.4883  gen_acc=0.843
+
+
+Epoch 082/150 Summary | LR=0.000129
+  Train — total=0.6886  id=0.5077  tri=0.4043  orth=0.230320  gen=0.0610
+  Val   — total=4.9307  id=8.0115  tri=0.7054  gen=0.4390  gen_acc=0.847
+
+
+Epoch 083/150 Summary | LR=0.000126
+  Train — total=0.6899  id=0.5145  tri=0.3953  orth=0.251715  gen=0.0746
+  Val   — total=5.2550  id=8.5283  tri=0.7200  gen=0.5418  gen_acc=0.843
+
+
+Epoch 084/150 Summary | LR=0.000122
+  Train — total=0.6269  id=0.4552  tri=0.3615  orth=0.261535  gen=0.0755
+  Val   — total=5.0993  id=8.0312  tri=0.7341  gen=0.6992  gen_acc=0.708
+
+
+Epoch 085/150 Summary | LR=0.000119
+  Train — total=0.6757  id=0.5262  tri=0.3858  orth=0.244650  gen=0.0536
+  Val   — total=4.8280  id=7.6383  tri=0.7325  gen=0.5526  gen_acc=0.769
+
+
+Epoch 086/150 Summary | LR=0.000116
+  Train — total=0.6558  id=0.5085  tri=0.3719  orth=0.257104  gen=0.0592
+  Val   — total=5.0220  id=7.9233  tri=0.7319  gen=0.6569  gen_acc=0.718
+
+
+Epoch 087/150 Summary | LR=0.000113
+  Train — total=0.6865  id=0.5069  tri=0.3855  orth=0.234310  gen=0.0952
+  Val   — total=4.9032  id=7.7525  tri=0.7284  gen=0.5970  gen_acc=0.731
+
+
+Epoch 088/150 Summary | LR=0.000110
+  Train — total=0.7293  id=0.5488  tri=0.4095  orth=0.229580  gen=0.0908
+  Val   — total=5.1618  id=8.5276  tri=0.7270  gen=0.3418  gen_acc=0.833
+
+
+Epoch 089/150 Summary | LR=0.000107
+  Train — total=0.7079  id=0.5776  tri=0.3902  orth=0.244810  gen=0.0577
+  Val   — total=5.1137  id=8.3498  tri=0.7357  gen=0.4062  gen_acc=0.810
+
+
+Epoch 090/150 Summary | LR=0.000104
+  Train — total=0.6552  id=0.4920  tri=0.3723  orth=0.236944  gen=0.0738
+  Val   — total=4.9797  id=8.1479  tri=0.7373  gen=0.3369  gen_acc=0.852
+
+  WS Rank-1 (epoch 90): 71.78%
+Best checkpoint saved (Rank-1=71.78%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_090.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=4.9797)
+
+Epoch 091/150 Summary | LR=0.000101
+  Train — total=0.6304  id=0.4808  tri=0.3591  orth=0.252360  gen=0.0620
+  Val   — total=5.2058  id=8.5602  tri=0.7368  gen=0.3779  gen_acc=0.843
+
+
+Epoch 092/150 Summary | LR=0.000098
+  Train — total=0.6604  id=0.5105  tri=0.3691  orth=0.245514  gen=0.0720
+  Val   — total=5.1728  id=8.4253  tri=0.7353  gen=0.4497  gen_acc=0.806
+
+
+Epoch 093/150 Summary | LR=0.000095
+  Train — total=0.6665  id=0.4893  tri=0.3787  orth=0.248120  gen=0.0863
+  Val   — total=5.1123  id=8.3999  tri=0.7328  gen=0.3591  gen_acc=0.847
+
+
+Epoch 094/150 Summary | LR=0.000093
+  Train — total=0.6457  id=0.4624  tri=0.3894  orth=0.247933  gen=0.0501
+  Val   — total=5.0553  id=8.1449  tri=0.7480  gen=0.4697  gen_acc=0.875
+
+
+Epoch 095/150 Summary | LR=0.000090
+  Train — total=0.6239  id=0.4457  tri=0.3687  orth=0.257394  gen=0.0647
+  Val   — total=4.8863  id=7.8678  tri=0.7500  gen=0.4050  gen_acc=0.796
+
+
+Epoch 096/150 Summary | LR=0.000087
+  Train — total=0.6729  id=0.5111  tri=0.3767  orth=0.241897  gen=0.0812
+  Val   — total=4.9595  id=7.8944  tri=0.7441  gen=0.5365  gen_acc=0.773
+
+
+Epoch 097/150 Summary | LR=0.000084
+  Train — total=0.6422  id=0.4457  tri=0.3866  orth=0.238865  gen=0.0655
+  Val   — total=4.8480  id=7.7087  tri=0.7490  gen=0.4892  gen_acc=0.778
+
+
+Epoch 098/150 Summary | LR=0.000081
+  Train — total=0.6271  id=0.4520  tri=0.3713  orth=0.242333  gen=0.0597
+  Val   — total=4.7803  id=7.6890  tri=0.7548  gen=0.3619  gen_acc=0.838
+
+
+Epoch 099/150 Summary | LR=0.000078
+  Train — total=0.5695  id=0.3635  tri=0.3522  orth=0.239230  gen=0.0711
+  Val   — total=4.7072  id=7.5263  tri=0.7467  gen=0.3947  gen_acc=0.824
+
+
+Epoch 100/150 Summary | LR=0.000076
+  Train — total=0.6308  id=0.4931  tri=0.3591  orth=0.236400  gen=0.0502
+  Val   — total=4.9086  id=7.9180  tri=0.7452  gen=0.4087  gen_acc=0.829
+
+  WS Rank-1 (epoch 100): 72.44%
+Best checkpoint saved (Rank-1=72.44%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_100.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=4.9086)
+
+Epoch 101/150 Summary | LR=0.000073
+  Train — total=0.5493  id=0.3746  tri=0.3380  orth=0.262209  gen=0.0480
+  Val   — total=4.8825  id=7.8792  tri=0.7563  gen=0.3732  gen_acc=0.815
+
+
+Epoch 102/150 Summary | LR=0.000070
+  Train — total=0.6057  id=0.4225  tri=0.3629  orth=0.251415  gen=0.0630
+  Val   — total=4.7632  id=7.6370  tri=0.7579  gen=0.3736  gen_acc=0.824
+
+
+Epoch 103/150 Summary | LR=0.000068
+  Train — total=0.5688  id=0.3881  tri=0.3468  orth=0.240870  gen=0.0557
+  Val   — total=4.7012  id=7.4938  tri=0.7543  gen=0.4001  gen_acc=0.819
+
+
+Epoch 104/150 Summary | LR=0.000065
+  Train — total=0.6072  id=0.4671  tri=0.3424  orth=0.248730  gen=0.0625
+  Val   — total=4.8436  id=7.7394  tri=0.7581  gen=0.4317  gen_acc=0.815
+
+
+Epoch 105/150 Summary | LR=0.000063
+  Train — total=0.5407  id=0.3809  tri=0.3175  orth=0.253421  gen=0.0655
+  Val   — total=5.0134  id=8.0045  tri=0.7798  gen=0.4627  gen_acc=0.801
+
+
+Epoch 106/150 Summary | LR=0.000060
+  Train — total=0.5681  id=0.3932  tri=0.3389  orth=0.249001  gen=0.0652
+  Val   — total=4.8738  id=7.7426  tri=0.7802  gen=0.4447  gen_acc=0.801
+
+
+Epoch 107/150 Summary | LR=0.000058
+  Train — total=0.5869  id=0.4105  tri=0.3519  orth=0.256640  gen=0.0596
+  Val   — total=4.7532  id=7.5820  tri=0.7607  gen=0.4030  gen_acc=0.815
+
+
+Epoch 108/150 Summary | LR=0.000055
+  Train — total=0.5492  id=0.3732  tri=0.3388  orth=0.246610  gen=0.0475
+  Val   — total=4.7838  id=7.6359  tri=0.7579  gen=0.4158  gen_acc=0.806
+
+
+Epoch 109/150 Summary | LR=0.000053
+  Train — total=0.5044  id=0.3560  tri=0.3065  orth=0.235261  gen=0.0396
+  Val   — total=4.8072  id=7.6611  tri=0.7601  gen=0.4330  gen_acc=0.815
+
+
+Epoch 110/150 Summary | LR=0.000050
+  Train — total=0.5408  id=0.3828  tri=0.3205  orth=0.233559  gen=0.0578
+  Val   — total=4.9391  id=7.8532  tri=0.7774  gen=0.4702  gen_acc=0.782
+
+  WS Rank-1 (epoch 110): 71.11%
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_110.pth
+
+Epoch 111/150 Summary | LR=0.000048
+  Train — total=0.5174  id=0.3754  tri=0.3097  orth=0.238051  gen=0.0400
+  Val   — total=4.8262  id=7.6409  tri=0.7779  gen=0.4558  gen_acc=0.792
+
+
+Epoch 112/150 Summary | LR=0.000046
+  Train — total=0.5751  id=0.4278  tri=0.3351  orth=0.256005  gen=0.0521
+  Val   — total=4.7689  id=7.5851  tri=0.7772  gen=0.3983  gen_acc=0.824
+
+
+Epoch 113/150 Summary | LR=0.000044
+  Train — total=0.5174  id=0.3344  tri=0.3196  orth=0.257193  gen=0.0611
+  Val   — total=4.8421  id=7.7429  tri=0.7716  gen=0.3981  gen_acc=0.810
+
+
+Epoch 114/150 Summary | LR=0.000042
+  Train — total=0.5308  id=0.3413  tri=0.3340  orth=0.241610  gen=0.0523
+  Val   — total=4.9063  id=7.8969  tri=0.7749  gen=0.3658  gen_acc=0.852
+
+
+Epoch 115/150 Summary | LR=0.000039
+  Train — total=0.5478  id=0.3767  tri=0.3323  orth=0.242996  gen=0.0542
+  Val   — total=4.8953  id=7.8677  tri=0.7798  gen=0.3633  gen_acc=0.819
+
+
+Epoch 116/150 Summary | LR=0.000037
+  Train — total=0.5760  id=0.4165  tri=0.3461  orth=0.247844  gen=0.0432
+  Val   — total=4.9721  id=8.0067  tri=0.7811  gen=0.3754  gen_acc=0.833
+
+
+Epoch 117/150 Summary | LR=0.000035
+  Train — total=0.5352  id=0.3860  tri=0.3110  orth=0.233217  gen=0.0624
+  Val   — total=4.8013  id=7.6646  tri=0.7821  gen=0.3737  gen_acc=0.829
+
+
+Epoch 118/150 Summary | LR=0.000033
+  Train — total=0.4894  id=0.3384  tri=0.3002  orth=0.241739  gen=0.0401
+  Val   — total=4.7659  id=7.5620  tri=0.7819  gen=0.4060  gen_acc=0.824
+
+
+Epoch 119/150 Summary | LR=0.000031
+  Train — total=0.5551  id=0.3866  tri=0.3332  orth=0.243383  gen=0.0572
+  Val   — total=4.8570  id=7.7623  tri=0.7827  gen=0.3863  gen_acc=0.819
+
+
+Epoch 120/150 Summary | LR=0.000030
+  Train — total=0.4845  id=0.3492  tri=0.2898  orth=0.244573  gen=0.0402
+  Val   — total=4.8492  id=7.7364  tri=0.7857  gen=0.3906  gen_acc=0.819
+
+  WS Rank-1 (epoch 120): 72.00%
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_120.pth
+
+Epoch 121/150 Summary | LR=0.000028
+  Train — total=0.4737  id=0.3330  tri=0.2909  orth=0.239784  gen=0.0326
+  Val   — total=4.8157  id=7.6381  tri=0.7867  gen=0.4200  gen_acc=0.810
+
+
+Epoch 122/150 Summary | LR=0.000026
+  Train — total=0.5121  id=0.3416  tri=0.3155  orth=0.240498  gen=0.0515
+  Val   — total=4.8217  id=7.6384  tri=0.7910  gen=0.4230  gen_acc=0.801
+
+
+Epoch 123/150 Summary | LR=0.000024
+  Train — total=0.5406  id=0.3867  tri=0.3147  orth=0.242571  gen=0.0652
+  Val   — total=4.8536  id=7.7167  tri=0.7944  gen=0.4018  gen_acc=0.810
+
+
+Epoch 124/150 Summary | LR=0.000023
+  Train — total=0.4817  id=0.3197  tri=0.3023  orth=0.228295  gen=0.0391
+  Val   — total=4.8474  id=7.6983  tri=0.8002  gen=0.3962  gen_acc=0.843
+
+
+Epoch 125/150 Summary | LR=0.000021
+  Train — total=0.5111  id=0.3564  tri=0.3113  orth=0.238464  gen=0.0431
+  Val   — total=4.8417  id=7.6911  tri=0.8035  gen=0.3851  gen_acc=0.852
+
+
+Epoch 126/150 Summary | LR=0.000019
+  Train — total=0.5758  id=0.4315  tri=0.3297  orth=0.219801  gen=0.0606
+  Val   — total=4.8836  id=7.7956  tri=0.7991  gen=0.3735  gen_acc=0.843
+
+
+Epoch 127/150 Summary | LR=0.000018
+  Train — total=0.5121  id=0.3564  tri=0.3098  orth=0.235082  gen=0.0482
+  Val   — total=4.8814  id=7.7854  tri=0.7983  gen=0.3808  gen_acc=0.829
+
+
+Epoch 128/150 Summary | LR=0.000017
+  Train — total=0.5018  id=0.3506  tri=0.3024  orth=0.227860  gen=0.0481
+  Val   — total=4.8453  id=7.7232  tri=0.7978  gen=0.3718  gen_acc=0.833
+
+
+Epoch 129/150 Summary | LR=0.000015
+  Train — total=0.5173  id=0.3770  tri=0.3120  orth=0.228194  gen=0.0335
+  Val   — total=4.7671  id=7.5752  tri=0.7941  gen=0.3709  gen_acc=0.838
+
+
+Epoch 130/150 Summary | LR=0.000014
+  Train — total=0.4930  id=0.3548  tri=0.2959  orth=0.232305  gen=0.0393
+  Val   — total=4.8256  id=7.6907  tri=0.7938  gen=0.3730  gen_acc=0.833
+
+  WS Rank-1 (epoch 130): 72.89%
+Best checkpoint saved (Rank-1=72.89%)
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_130.pth
+Best checkpoint saved: experiments/fvgb_nobt_seed789/best.pth  (val_loss=4.8256)
+
+Epoch 131/150 Summary | LR=0.000013
+  Train — total=0.4726  id=0.3244  tri=0.2877  orth=0.254506  gen=0.0454
+  Val   — total=4.8270  id=7.6965  tri=0.7947  gen=0.3682  gen_acc=0.833
+
+
+Epoch 132/150 Summary | LR=0.000011
+  Train — total=0.5456  id=0.4196  tri=0.3117  orth=0.236310  gen=0.0482
+  Val   — total=4.8361  id=7.7070  tri=0.7962  gen=0.3727  gen_acc=0.833
+
+
+Epoch 133/150 Summary | LR=0.000010
+  Train — total=0.5130  id=0.3693  tri=0.2997  orth=0.234365  gen=0.0574
+  Val   — total=4.8500  id=7.7435  tri=0.7957  gen=0.3650  gen_acc=0.843
+
+
+Epoch 134/150 Summary | LR=0.000009
+  Train — total=0.4487  id=0.2872  tri=0.2806  orth=0.228764  gen=0.0489
+  Val   — total=4.8143  id=7.6647  tri=0.7960  gen=0.3719  gen_acc=0.829
+
+
+Epoch 135/150 Summary | LR=0.000008
+  Train — total=0.4383  id=0.2918  tri=0.2783  orth=0.238058  gen=0.0281
+  Val   — total=4.8310  id=7.7039  tri=0.7955  gen=0.3672  gen_acc=0.829
+
+
+Epoch 136/150 Summary | LR=0.000007
+  Train — total=0.5038  id=0.3474  tri=0.2984  orth=0.237510  gen=0.0634
+  Val   — total=4.8164  id=7.6839  tri=0.7947  gen=0.3595  gen_acc=0.833
+
+
+Epoch 137/150 Summary | LR=0.000007
+  Train — total=0.4888  id=0.3622  tri=0.2911  orth=0.244034  gen=0.0331
+  Val   — total=4.8269  id=7.6927  tri=0.7975  gen=0.3660  gen_acc=0.833
+
+
+Epoch 138/150 Summary | LR=0.000006
+  Train — total=0.4765  id=0.3404  tri=0.2854  orth=0.234710  gen=0.0418
+  Val   — total=4.8276  id=7.6904  tri=0.7973  gen=0.3703  gen_acc=0.833
+
+
+Epoch 139/150 Summary | LR=0.000005
+  Train — total=0.5019  id=0.3869  tri=0.2885  orth=0.238429  gen=0.0400
+  Val   — total=4.7922  id=7.6106  tri=0.7982  gen=0.3774  gen_acc=0.824
+
+
+Epoch 140/150 Summary | LR=0.000004
+  Train — total=0.5196  id=0.3566  tri=0.3154  orth=0.234417  gen=0.0518
+  Val   — total=4.8118  id=7.6677  tri=0.7966  gen=0.3626  gen_acc=0.838
+
+  WS Rank-1 (epoch 140): 72.22%
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_140.pth
+
+Epoch 141/150 Summary | LR=0.000004
+  Train — total=0.4750  id=0.3172  tri=0.2963  orth=0.239865  gen=0.0401
+  Val   — total=4.8097  id=7.6522  tri=0.7953  gen=0.3765  gen_acc=0.824
+
+
+Epoch 142/150 Summary | LR=0.000003
+  Train — total=0.4740  id=0.3369  tri=0.2890  orth=0.242078  gen=0.0331
+  Val   — total=4.8392  id=7.7146  tri=0.7958  gen=0.3722  gen_acc=0.829
+
+
+Epoch 143/150 Summary | LR=0.000003
+  Train — total=0.4523  id=0.2995  tri=0.2803  orth=0.230976  gen=0.0445
+  Val   — total=4.8464  id=7.7335  tri=0.7955  gen=0.3683  gen_acc=0.838
+
+
+Epoch 144/150 Summary | LR=0.000002
+  Train — total=0.4305  id=0.2946  tri=0.2605  orth=0.236396  gen=0.0453
+  Val   — total=4.7998  id=7.6374  tri=0.7947  gen=0.3727  gen_acc=0.829
+
+
+Epoch 145/150 Summary | LR=0.000002
+  Train — total=0.4783  id=0.3389  tri=0.2894  orth=0.235110  gen=0.0387
+  Val   — total=4.7883  id=7.6256  tri=0.7950  gen=0.3609  gen_acc=0.843
+
+
+Epoch 146/150 Summary | LR=0.000002
+  Train — total=0.4638  id=0.3224  tri=0.2804  orth=0.239356  gen=0.0443
+  Val   — total=4.7983  id=7.6393  tri=0.7945  gen=0.3683  gen_acc=0.833
+
+
+Epoch 147/150 Summary | LR=0.000001
+  Train — total=0.4882  id=0.3642  tri=0.2883  orth=0.228691  gen=0.0355
+  Val   — total=4.7826  id=7.6095  tri=0.7951  gen=0.3655  gen_acc=0.833
+
+
+Epoch 148/150 Summary | LR=0.000001
+  Train — total=0.4586  id=0.3019  tri=0.2804  orth=0.248788  gen=0.0546
+  Val   — total=4.7824  id=7.6057  tri=0.7958  gen=0.3675  gen_acc=0.843
+
+
+Epoch 149/150 Summary | LR=0.000001
+  Train — total=0.4373  id=0.3118  tri=0.2651  orth=0.240533  gen=0.0326
+  Val   — total=4.7782  id=7.5993  tri=0.7951  gen=0.3669  gen_acc=0.843
+
+
+Epoch 150/150 Summary | LR=0.000001
+  Train — total=0.4160  id=0.2487  tri=0.2718  orth=0.236321  gen=0.0397
+  Val   — total=4.7877  id=7.6185  tri=0.7951  gen=0.3667  gen_acc=0.833
+
+  WS Rank-1 (epoch 150): 72.22%
+Checkpoint saved: experiments/fvgb_nobt_seed789/epoch_150.pth
+Training complete.
