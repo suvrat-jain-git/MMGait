@@ -57,6 +57,10 @@ def parse_args():
                         help='Disable the Bio-Kinematic Graph (ablation): '
                              'Fm and Fk pass straight through with no '
                              'cross-branch interaction at all')
+    parser.add_argument('--no_gender', action='store_true',
+                        help='Disable gender supervision (sets w_gender=0.0 '
+                             'and removes gender head). Used for the '
+                             'No-Gender-Supervision ablation.')
     parser.add_argument('--no_barlow', action='store_true',
                         help='Disable Barlow Twins disentanglement loss '
                              '(sets w_orthogonality=0.0). Used for the '
@@ -96,6 +100,15 @@ def main():
     if args.no_barlow:
         cfg['training']['loss_weights']['orthogonality'] = 0.0
         print("Barlow Twins loss DISABLED (w_orthogonality=0.0)")
+
+    if args.no_gender:
+        cfg['training']['loss_weights']['gender'] = 0.0
+        # Also tell DatasetMeta that this run treats gender as absent
+        # so the model factory doesn't build a gender head -- this is
+        # what makes it a true ablation (no head, no loss) rather than
+        # just zeroing the loss weight while keeping the head in the graph
+        cfg['dataset']['force_no_gender'] = True
+        print("Gender supervision DISABLED (w_gender=0.0, no gender head)")
 
     # -- Reproducibility --------------------------------------------------
     seed = args.seed

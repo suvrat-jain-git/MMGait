@@ -1,65 +1,3 @@
-"""
-multi_seed_results.py — Multi-Seed Aggregation + Statistical Significance
-(V2: dataset-agnostic, 5 seeds, Wilcoxon signed-rank test)
-
-Two modes:
-
-    1. AGGREGATE mode (default): evaluate one model configuration across
-       5 seed checkpoints, report mean +/- std per protocol/metric. This
-       is the direct successor to the original 3-seed V1 script.
-
-    2. COMPARE mode (--compare_checkpoints_b ...): evaluate TWO model
-       configurations (e.g. baseline vs final, or custom vs gaitbase
-       backbone, or graph vs no-graph) each across their own 5 seed
-       checkpoints, and run a paired Wilcoxon signed-rank test per
-       protocol/metric to determine whether the difference between the
-       two configurations is statistically significant -- not just
-       "config B's mean is higher", but "this difference is unlikely to
-       be due to seed-to-seed noise alone".
-
-Why Wilcoxon signed-rank (not a paired t-test):
-    With only 5 seeds, a t-test's normality assumption is hard to
-    justify -- there's no realistic way to check normality with n=5,
-    and accuracy/Rank-1 metrics are bounded in [0,1], which violates
-    the unbounded-support assumption a t-test implicitly relies on for
-    small samples. Wilcoxon signed-rank is the standard non-parametric
-    alternative for paired small-sample comparisons and makes no
-    distributional assumption beyond symmetry of the paired differences
-    -- the defensible choice for a 5-seed comparison in a paper.
-
-    method='exact' is used explicitly rather than scipy's 'auto' default,
-    because 'auto' can silently fall back to a normal approximation for
-    edge cases (e.g. all-identical paired values) that produces a
-    RuntimeWarning and an approximate p-value poorly suited to n=5 --
-    'exact' computes the exact permutation distribution, which is both
-    correct and well-defined at this sample size.
-
-Usage:
-
-    # Aggregate mode -- one config, 5 seeds, FVG-B
-    python analysis/multi_seed_results.py --dataset fvgb \
-        --checkpoints experiments/seed42_best.pth experiments/seed123_best.pth \
-                      experiments/seed456_best.pth experiments/seed789_best.pth \
-                      experiments/seed2024_best.pth
-
-    # Compare mode -- baseline (no graph) vs final (graph enabled),
-    # both on FVG-B, both with their own 5 seed checkpoints
-    python analysis/multi_seed_results.py --dataset fvgb \
-        --checkpoints experiments/baseline_seed42.pth ... (5 paths) \
-        --compare_checkpoints_b experiments/final_seed42.pth ... (5 paths) \
-        --no_graph_b false  # flags describing config B if it differs
-
-IMPORTANT: every checkpoint in --checkpoints must have been trained with
-the SAME --no_graph/--morph_backbone flags as each other (config A), and
-every checkpoint in --compare_checkpoints_b must share the SAME flags as
-each other (config B, which may differ from A) -- see
---no_graph/--morph_backbone (config A) and --no_graph_b/--morph_backbone_b
-(config B) below. Mismatched flags within one config's checkpoint list
-will fail with a clear state_dict error (same fail-loud behaviour as
-every other evaluator in this codebase), not a silent wrong-architecture
-load.
-"""
-
 import sys
 import argparse
 import yaml
@@ -437,6 +375,9 @@ def parse_args():
                              'recommend 5: e.g. seeds 42,123,456,789,2024)')
     parser.add_argument('--no_graph', action='store_true',
                         help='Flag config A checkpoints were trained with.')
+    parser.add_argument('--no_gender', action='store_true',
+                        help='Flag config A checkpoints were trained without '
+                             'gender supervision (--no_gender in train.py).')
     parser.add_argument('--morph_backbone', default='custom',
                         choices=['custom', 'gaitbase'],
                         help='Flag config A checkpoints were trained with.')
@@ -448,6 +389,9 @@ def parse_args():
                              'against config A.')
     parser.add_argument('--no_graph_b', action='store_true',
                         help='Flag config B checkpoints were trained with.')
+    parser.add_argument('--no_gender_b', action='store_true',
+                        help='Flag config B checkpoints were trained without '
+                             'gender supervision.')
     parser.add_argument('--morph_backbone_b', default='custom',
                         choices=['custom', 'gaitbase'],
                         help='Flag config B checkpoints were trained with.')
@@ -489,6 +433,9 @@ def main():
             cfg.update(yaml.safe_load(f))
 
     print("Building dataloaders (shared across all checkpoints/seeds)...")
+    if args.no_gender:
+        cfg['dataset']['force_no_gender'] = True
+        print("Gender supervision: DISABLED (no gender head in checkpoints)")
     loaders = dataset_entry.builder(cfg)
     meta    = loaders['meta']
 
@@ -520,12 +467,25 @@ def main():
         print(f"\n{'='*50}")
         print(f"Evaluating {args.label_b} ({len(args.compare_checkpoints_b)} checkpoints)")
         print(f"{'='*50}")
+
+        # If config B has different gender setting, rebuild dataloaders
+        if args.no_gender_b != args.no_gender:
+            cfg_b = dict(cfg)
+            cfg_b['dataset'] = dict(cfg.get('dataset', {}))
+            cfg_b['dataset']['force_no_gender'] = args.no_gender_b
+            loaders_b = dataset_entry.builder(cfg_b)
+            meta_b = loaders_b['meta']
+            print(f"Gender supervision for B: {'DISABLED' if args.no_gender_b else 'ENABLED'}")
+        else:
+            loaders_b = loaders
+            meta_b = meta
+
         gait_b, gender_b, age_b = evaluate_all_seeds(
-            args.compare_checkpoints_b, cfg, meta, loaders, device,
+            args.compare_checkpoints_b, cfg, meta_b, loaders_b, device,
             use_graph=not args.no_graph_b, morph_backbone=args.morph_backbone_b,
             label=args.label_b,
         )
-        print_aggregate_report(gait_b, gender_b, age_b, meta, label=args.label_b)
+        print_aggregate_report(gait_b, gender_b, age_b, meta_b, label=args.label_b)
 
         comparison = print_comparison_report(
             gait_a, gender_a, age_a, gait_b, gender_b, age_b, meta,

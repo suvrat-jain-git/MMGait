@@ -1,58 +1,3 @@
-"""
-fvg_b.py — FVG-B Dataset Loader (Official Protocol-Aware Version)
-
-Directory structure on disk:
-    <root>/
-        crop_sil/
-            session{1,2,3}/
-                {subject_id:03d}/       e.g. 001, 002, ...
-                    {sequence_id:02d}/  e.g. 01, 02, ..., 12
-                        {frame:05d}.png e.g. 00001.png
-        annotated_gender_information.csv   (subject_id,M/F — no header)
-        train_id_list.txt                  (one subject_id per line)
-        test_id_list.txt                   (one subject_id per line)
-
-Session / Subject mapping (from FVG-B report Table 2):
-    Subjects   1–147  → Session 1
-    Subjects 148–226  → Session 2
-    Session 3 subjects (bold in Table 2) → always in test set
-
-Sequence ID meaning (from FVG-B report Table 1):
-    Session 1:
-        01,02,03 → Normal walk       (3 viewing angles: -45°, 0°, 45°)
-        04,05,06 → Fast walk
-        07,08,09 → Slow walk
-        10,11,12 → Bag / Hat
-    Session 2:
-        01,02,03 → Normal walk
-        04,05,06 → Fast walk
-        07,08,09 → Change clothes
-        10,11,12 → Multiple person
-
-Official Evaluation Protocols (FVG-B report Table 3):
-    Gallery is ALWAYS sequence '02' of Session 1 or 2.
-    Probe sequences depend on the protocol:
-
-    Protocol  Gallery       Probe
-    --------  -------       -----
-    WS        Sess1 seq02   Sess1 seq04-09
-    BGHT      Sess1 seq02   Sess1 seq10-12
-    CL        Sess2 seq02   Sess2 seq07-09
-    MP        Sess2 seq02   Sess2 seq10-12
-    ALL       Sess1 seq02   Sess1 seq01,03-12
-              Sess2 seq02   Sess2 seq01,03-12
-              Session3      Session3 seq01-12
-
-Database Split:
-    1% and 5% of test subjects are randomly selected as gallery subjects.
-    Remaining test subjects are probe subjects.
-    Random seed = 0 (original seed not publicly available; documented here).
-
-Identity labels:
-    Remapped to 0-indexed integers within the training split.
-    Val split: last 10% of sorted train IDs (deterministic).
-"""
-
 import os
 import csv
 import random
@@ -743,7 +688,7 @@ def build_fvgb_dataloaders(cfg):
 
     meta = DatasetMeta(
         name='fvgb',
-        has_gender=True,
+        has_gender=not cfg['dataset'].get('force_no_gender', False),
         has_age=False,
         num_identities=num_classes,
         image_size=(image_size, image_size),

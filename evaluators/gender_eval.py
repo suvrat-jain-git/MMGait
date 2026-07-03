@@ -1,39 +1,3 @@
-"""
-gender_eval.py — Gender + Age Disentanglement Evaluator (V2: dataset-agnostic)
-
-Evaluates, for the active --dataset:
-    1. Gender head accuracy from Fm' (gender_logits)
-       Metrics: accuracy, balanced accuracy, F1 Male, F1 Female
-    2. Linear probe on Fm -- should be HIGH (morphology encodes gender)
-    3. Linear probe on Fk -- should be ~50% (motion should NOT encode gender)
-    4. EER for gender verification from Fm embeddings
-    5. CONDITIONALLY (only if the loaded model has an age_head, i.e. was
-       trained on a has_age dataset): the same four-part analysis for
-       age -- age head classification accuracy/MAE, linear probe on Fm
-       vs Fk for age-bin prediction, disentanglement gap. Age linear
-       probes are computed ONLY over samples with a valid age label
-       (the partial-label subset), matching the masking convention used
-       throughout the rest of this codebase.
-
-Usage:
-    python evaluators/gender_eval.py --dataset fvgb --checkpoint experiments/best.pth
-    python evaluators/gender_eval.py --dataset oulp_mvlp --checkpoint experiments/best.pth
-
-Changes from the original (FVG-B-only) evaluator:
-    - extract_features() reads dict batches (datasets/base.py
-      gait_collate_fn format) instead of unpacking a (frames, id_labels,
-      gender_labels) tuple, and ALSO collects age_bin_logits/age_value/
-      age_label/age_mask when the model produces them.
-    - Model construction goes through models/factory.py + the dataset
-      registry, exactly like the rewritten gait_eval.py, instead of
-      hardcoding build_fvgb_dataloaders + unconditional gender injection.
-    - The age disentanglement block (probe gap, FDR-style "Fm > Fk"
-      check) only runs when the checkpoint's model actually has an
-      age_head -- running this evaluator against an FVG-B checkpoint
-      (no age) produces exactly the original gender-only report, with
-      no age section printed or saved.
-"""
-
 import os
 import sys
 import json
@@ -92,6 +56,11 @@ def extract_features(model, loader, device):
                 has_gender = True
                 all_gender_logits.append(out['gender_logits'].cpu())
                 all_gender_labels.extend(batch['gender_label'].tolist())
+            elif batch.get('gender_label') is not None:
+                # Model has no gender head but dataset has gender labels --
+                # still collect labels for linear probe analysis
+                has_gender = True
+                all_gender_labels.extend(batch['gender_label'].tolist())
 
             if 'age_bin_logits' in out:
                 has_age = True
@@ -116,7 +85,8 @@ def extract_features(model, loader, device):
         'id_labels':  torch.tensor(all_id_labels),
     }
     if has_gender:
-        result['gender_logits'] = torch.cat(all_gender_logits, dim=0)
+        if all_gender_logits:
+            result['gender_logits'] = torch.cat(all_gender_logits, dim=0)
         result['gender_labels'] = torch.tensor(all_gender_labels)
     if has_age:
         result['age_bin_logits'] = torch.cat(all_age_bin_logits, dim=0)
@@ -177,8 +147,19 @@ def run_gender_evaluation(checkpoint_path, cfg, device, plot_dir,
     from models.factory import build_model_config
     from models.biokinematic_net import BioKinematicNet
 
+    # If checkpoint was trained without gender head, build model without
+    # one -- but keep dataset gender labels for linear probe analysis
+    meta_for_model = meta
+    if cfg.get('model', {}).get('force_no_gender_head', False):
+        from datasets.base import DatasetMeta
+        meta_for_model = DatasetMeta(
+            name=meta.name, has_gender=False, has_age=meta.has_age,
+            num_identities=meta.num_identities, image_size=meta.image_size,
+            sequence_length=meta.sequence_length, protocols=meta.protocols,
+        )
+
     model_cfg = build_model_config(
-        cfg['model'], cfg['heads'], meta,
+        cfg['model'], cfg['heads'], meta_for_model,
         use_graph=use_graph, morph_backbone=morph_backbone,
     )
     model = BioKinematicNet(model_cfg).to(device)
@@ -269,9 +250,40 @@ def run_gender_evaluation(checkpoint_path, cfg, device, plot_dir,
             'linear_probe_Fk_gender':        acc_fk,
             'disentanglement_gap_gender':    gap,
         })
+    elif 'gender_labels' in feats:
+        # No gender head but dataset HAS gender labels -- run linear
+        # probe only to check implicit gender encoding in Fm/Fk.
+        # This is the key analysis for the no-gender-supervision ablation.
+        print("\n=== No Gender Head -- Linear Probe Analysis Only ===")
+        print("(Testing whether Fm/Fk implicitly encode gender "
+              "without explicit supervision)")
+        print(f"\nVal samples: {len(feats['gender_labels'])}")
+
+        print("\n=== Linear Probe on Fm (morphology) ===")
+        print("Training linear probe (avg 5 seeds)...")
+        acc_fm = train_linear_probe_avg(feats['Fm'], feats['gender_labels'], n_classes=2)
+        print(f"Linear probe accuracy on Fm: {acc_fm*100:.2f}%")
+
+        print("\n=== Linear Probe on Fk (motion) ===")
+        print("Training linear probe (avg 5 seeds)...")
+        acc_fk = train_linear_probe_avg(feats['Fk'], feats['gender_labels'], n_classes=2)
+        print(f"Linear probe accuracy on Fk: {acc_fk*100:.2f}%")
+
+        gap = acc_fm - acc_fk
+        print(f"\nImplicit disentanglement gap (Fm - Fk): {gap*100:.2f}%")
+        if gap > 0.15:
+            print("  Fm implicitly encodes gender more than Fk even without supervision")
+        else:
+            print("  Without supervision, Fm and Fk encode similar gender information")
+
+        results.update({
+            'linear_probe_Fm_gender':     acc_fm,
+            'linear_probe_Fk_gender':     acc_fk,
+            'disentanglement_gap_gender': gap,
+        })
     else:
-        print("\nModel has no gender_head -- skipping gender analysis "
-              "(this is expected for a no-gender dataset).")
+        print("\nModel has no gender_head and no gender labels available "
+              "-- skipping gender analysis entirely.")
 
     # ---- AGE ANALYSIS (only if model has an age head AND val set has
     #      at least some age-labeled samples) ---------------------------------
@@ -350,6 +362,11 @@ def parse_args():
     parser.add_argument('--no_graph', action='store_true',
                         help='Must match the flag used when this '
                              'checkpoint was trained.')
+    parser.add_argument('--no_gender', action='store_true',
+                        help='Checkpoint was trained without gender '
+                             'supervision (--no_gender in train.py). '
+                             'Skips gender head evaluation but still '
+                             'runs linear probes on Fm/Fk.')
     parser.add_argument('--morph_backbone', default='custom',
                         choices=['custom', 'gaitbase'],
                         help='Must match the flag used when this '
@@ -376,6 +393,14 @@ def main():
     for path in dataset_entry.config_files:
         with open(path) as f:
             cfg.update(yaml.safe_load(f))
+
+    if args.no_gender:
+        # For gender_eval we want gender labels from the dataset for
+        # linear probe analysis -- only tell the MODEL to have no gender
+        # head, not the dataloader to strip gender labels. So we DON'T
+        # set force_no_gender here; instead we pass it only to the model
+        # factory via a separate cfg key.
+        cfg['model']['force_no_gender_head'] = True
 
     results = run_gender_evaluation(
         args.checkpoint, cfg, device, args.plot_dir, dataset_entry,

@@ -1,0 +1,24 @@
+Device: cuda
+Building dataloaders...
+PKSampler ready: 74 male + 44 female identities, P=8 (balanced), K=4, batch_size=32
+PKSampler: P=8 identities × K=4 samples = batch_size=32
+Loaded checkpoint from epoch 130
+Extracting features from val set...
+
+=== No Gender Head -- Linear Probe Analysis Only ===
+(Testing whether Fm/Fk implicitly encode gender without explicit supervision)
+
+Val samples: 216
+
+=== Linear Probe on Fm (morphology) ===
+Training linear probe (avg 5 seeds)...
+Linear probe accuracy on Fm: 93.18%
+
+=== Linear Probe on Fk (motion) ===
+Training linear probe (avg 5 seeds)...
+Linear probe accuracy on Fk: 63.18%
+
+Implicit disentanglement gap (Fm - Fk): 30.00%
+  Fm implicitly encodes gender more than Fk even without supervision
+
+Results saved to experiments/fvgb_nogender_seed42/best_gender_age_results.json
