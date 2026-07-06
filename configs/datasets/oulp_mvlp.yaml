@@ -1,6 +1,6 @@
 dataset:
   name: OU-MVLP
-  root: /data/oulp_mvlp/   # UPDATE to your actual server path after
+  root: /home/suvrat/data/oulp_mvlp/   # UPDATE to your actual server path after
                            # transferring from the NUC
 
   # --- Silhouette Properties ---
@@ -27,8 +27,8 @@ dataset:
   # CONFIRM these match your actual downloaded filenames -- the
   # official page links them as "Subject_List" / "Subject list with
   # age and gender" without showing the literal saved filename.
-  gender_label_file: subject_list.csv
-  age_gender_intersection_file: subject_list_age_gender.csv
+  id_list_file: ID_list.csv                    # train/test split (paired columns)
+  subject_info_file: subject_info_OUMVLP.csv  # gender + age for all subjects
 
   # --- Train/Test Split ---
   # STANDARD OU-MVLP split (subject ID range, NOT random) -- hardcoded

@@ -1,108 +1,3 @@
-"""
-oulp_mvlp.py — OU-MVLP (Multi-View Large Population) Dataset Loader
-
-REPLACES the earlier datasets/oulp_bag.py, which was built against an
-incorrect understanding of this dataset (assumed a bag/no-bag carrying
-covariate; the real dataset's covariate is VIEW ANGLE, confirmed
-directly from the official OU-ISIR download page). See module-level
-git history / project notes for the correction. The file is renamed
-(oulp_bag -> oulp_mvlp) rather than patched in place, since the
-directory structure, protocol design, and train/test split convention
-are all different enough that keeping the old name would be misleading.
-
-Directory structure on disk (confirmed from the official download page):
-    <root>/
-        GEI/
-            {view}-{sequence}/
-                {subject}.png
-        Silhouette_{view}-{sequence}/
-            {subject}/
-                {frame}.png
-
-    {view}     in {000,015,030,045,060,075,090,180,195,210,225,240,255,270}
-               (14 view angles, degrees, zero-padded to 3 digits)
-    {sequence} in {00, 01}
-    {subject}  zero-padded subject ID (width TBD -- see _format_subject_id;
-               the official OU-MVLP papers use 5-digit IDs, e.g. "00001")
-
-    Top-level note: view and sequence are baked into the SILHOUETTE
-    FOLDER NAME itself (Silhouette_000-00, Silhouette_000-01,
-    Silhouette_015-00, ...) -- NOT nested as subject/sequence/ like
-    FVG-B, and NOT a single flat Silhouette/ tree like the original
-    (incorrect) oulp_bag.py assumed. There are 14 views x 2 sequences
-    = 28 such Silhouette_* folders at the root, each containing one
-    subdirectory per subject.
-
-Standard OU-MVLP evaluation protocol (confirmed from multiple published
-papers using this exact dataset -- GaitSet, GaitGL, and others):
-    Train/test split: BY SUBJECT ID RANGE, not random.
-        Subjects 1-5153    -> training set   (5153 subjects)
-        Subjects 5154-10307 -> test set       (5154 subjects)
-    Gallery/probe: sequence '01' is gallery, sequence '00' is probe,
-        for EVERY view simultaneously.
-    Metrics: Rank-1, EER (matches what this codebase already computes
-        for FVG-B via evaluators/gait_eval.py).
-
-CROSS-VIEW PROTOCOL FLAG (--cross_view, see configs/train.yaml /
-train.py CLI plumbing in a later stage of this rewrite):
-    Two evaluation modes are supported, switched via DatasetMeta's
-    protocol list construction below:
-
-    same_view (default, lower compute cost):
-        Probe view N is evaluated ONLY against gallery view N.
-        Produces 14 independent protocol entries (one per view), each
-        a standard single-view Rank-1/EER -- structurally identical to
-        how every other protocol in this codebase already works (one
-        gallery loader, one probe loader, evaluate_protocol() as-is).
-
-    cross_view (the literature-standard OU-MVLP benchmark number):
-        Probe view N is evaluated against gallery views at ALL OTHER
-        13 views (excluding the identical view), then Rank-1 is
-        averaged across those 13 (probe view, gallery view) pairs.
-        This is what published OU-MVLP Rank-1 numbers in papers
-        actually report, and is the only version directly comparable
-        to existing literature baselines.
-
-        Because this is 14 x 13 = 182 (probe view, gallery view) pairs
-        rather than a single (gallery, probe) pair, the dataset loader
-        below exposes ALL 14 per-view gallery/probe DataLoaders
-        directly (see build_oulp_mvlp_dataloaders()'s 'view_loaders'
-        return key) rather than trying to force this into the
-        single-gallery-single-probe protocol_data shape every other
-        dataset in this codebase uses. The CROSS-VIEW AGGREGATION
-        ITSELF (computing all 182 pairs and averaging) is implemented
-        in evaluators/gait_eval.py's evaluate_cross_view_protocol(),
-        not here -- this module's job is only to expose the per-view
-        loaders cleanly; the evaluator owns the pairwise matrix logic.
-
-Identity labels:
-    Remapped to 0-indexed integers within the training split, same
-    convention as every other dataset loader in this codebase.
-
-Gender labels:
-    Dataset-wide per the official page -- DatasetMeta.has_gender = True.
-
-Age labels:
-    PARTIAL, via a separate "Subject list with age and gender" file,
-    same partial-label design as the original (corrected) oulp_bag.py
-    -- DatasetMeta.has_age = True (dataset SUPPORTS age), individual
-    samples outside the labeled subset get age_label=None per the
-    Sample contract. The official page notes that using these labels
-    requires citing an ADDITIONAL paper (Xu et al., "Real-Time
-    Gait-Based Age Estimation and Gender Classification...") beyond
-    the main OU-MVLP citation -- flagging this here so it doesn't get
-    missed when writing the paper's dataset/citation section.
-
-FORMAT ASSUMPTIONS STILL FLAGGED FOR VERIFICATION (same fail-loud
-design as before -- run this module's __main__ diagnostic against the
-real downloaded data before the first real training run):
-    - Exact subject ID zero-padding width (assumed 5 digits below,
-      matching the literature convention, but not pixel-verified
-      against an actual extracted directory listing)
-    - Exact column layout of the age/gender intersection file
-    - Exact frame filename zero-padding within each sequence folder
-"""
-
 import os
 import csv
 import random
@@ -147,124 +42,127 @@ def _format_subject_id(sid, width=5):
     return str(sid).zfill(width)
 
 
-def _load_gender_map(path):
+def _load_subject_info(path):
     """
-    Read the dataset-wide gender label file. Tries M/F, 0/1, Male/Female
-    encodings, same defensive approach as the original oulp_bag.py.
+    Read subject_info_OUMVLP.csv which contains ID, gender, age for
+    ALL 10,307 subjects. Format confirmed from real downloaded file:
+        ID,gender,age       <- header line
+        1,M,-               <- age '-' means no label for this subject
+        2,F,22
+        3,F,26
 
-    Returns dict: {subject_id (int) -> gender_label (int)}  M=0, F=1
+    Returns:
+        gender_map: {subject_id (int) -> gender_label (int)}  M=0, F=1
+        age_map:    {subject_id (int) -> age (float)}
+                    only subjects with a real age label (not '-')
     """
     gender_map = {}
+    age_map    = {}
+
     with open(path, 'r') as f:
         reader = csv.reader(f)
-        rows = [row for row in reader if row and any(c.strip() for c in row)]
+        for row in reader:
+            if not row or len(row) < 2:
+                continue
+            try:
+                sid = int(row[0].strip())
+            except ValueError:
+                continue   # skip header / comment lines
 
-    if not rows:
-        raise RuntimeError(f"Gender label file is empty: {path}")
+            g = row[1].strip().upper()
+            if g == 'M':
+                gender_map[sid] = 0
+            elif g == 'F':
+                gender_map[sid] = 1
+            else:
+                continue
 
-    def _parse_gender_token(token):
-        t = token.strip().upper()
-        if t in ('M', 'MALE', '0'):
-            return 0
-        if t in ('F', 'FEMALE', '1'):
-            return 1
-        return None
+            if len(row) >= 3:
+                age_token = row[2].strip()
+                if age_token != '-':
+                    try:
+                        age_map[sid] = float(age_token)
+                    except ValueError:
+                        pass
 
-    parsed_count = 0
-    for row in rows:
-        if len(row) < 2:
-            continue
-        try:
-            sid = int(row[0].strip())
-        except ValueError:
-            continue
-        gender = _parse_gender_token(row[1].strip())
-        if gender is None:
-            continue
-        gender_map[sid] = gender
-        parsed_count += 1
-
-    if parsed_count == 0:
+    if not gender_map:
         raise RuntimeError(
-            f"Could not parse ANY (subject_id, gender) pairs from {path}. "
-            f"Expected columns: subject_id, gender (M/F or 0/1 or "
-            f"Male/Female). First few raw rows: {rows[:5]}. Update "
-            f"_load_gender_map() in datasets/oulp_mvlp.py once the "
-            f"actual file format is confirmed."
+            f"Could not parse any (ID, gender) pairs from {path}. "
+            f"Expected format: ID,gender,age with header row. "
+            f"Check the file exists and has the correct format."
         )
+
+    n_male   = sum(1 for g in gender_map.values() if g == 0)
+    n_female = sum(1 for g in gender_map.values() if g == 1)
+    print(f"Subject info loaded: {len(gender_map)} subjects "
+          f"({n_male} M, {n_female} F), "
+          f"{len(age_map)} with age labels")
+    return gender_map, age_map
+
+
+def _load_train_test_split(path):
+    """
+    Read ID_list.csv which contains paired train/test subject IDs.
+    Format confirmed from real downloaded file:
+        Training & testing subject ID are shown...   <- comment lines
+        Note: Sequence 00 is used as Probe...
+                  while both sequences...
+                                                     <- blank line
+        Training subject ID, Testing subject ID      <- header
+        1,2                                          <- train_id, test_id
+        3,4
+        ...
+        10305,10306
+
+    Returns:
+        train_ids: sorted list of training subject IDs
+        test_ids:  sorted list of testing subject IDs
+    """
+    train_ids = []
+    test_ids  = []
+
+    with open(path, 'r') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if not row or len(row) < 2:
+                continue
+            # Handle the last row which has empty train ID (,10307)
+            # -- subject 10307 is test-only with no train pair
+            try:
+                tsid = int(row[1].strip())
+            except ValueError:
+                continue
+            test_ids.append(tsid)
+            try:
+                tid = int(row[0].strip())
+                train_ids.append(tid)
+            except ValueError:
+                pass   # empty train column -- test-only subject, skip for train
+
+    if not train_ids:
+        raise RuntimeError(
+            f"Could not parse any train/test ID pairs from {path}. "
+            f"Expected format: two numeric columns (train_id, test_id) "
+            f"after comment lines. Check the file exists and has the "
+            f"correct format."
+        )
+
+    print(f"Train/test split loaded: "
+          f"{len(train_ids)} train, {len(test_ids)} test subjects")
+    return sorted(train_ids), sorted(test_ids)
+
+
+# Backward-compatible aliases
+def _load_gender_map(path):
+    gender_map, _ = _load_subject_info(path)
     return gender_map
 
 
 def _load_age_gender_intersection(path):
-    """
-    Read the "Subject list with age and gender" file -- the PARTIAL
-    age-label source. Identical disambiguation logic to the original
-    oulp_bag.py (handles either age-then-gender or gender-then-age
-    column ordering).
-
-    NOTE: using these labels requires citing Xu et al.'s age-estimation
-    paper in addition to the main OU-MVLP citation -- see module
-    docstring.
-
-    Returns dict: {subject_id (int) -> age (float)}
-    """
-    age_map = {}
-    with open(path, 'r') as f:
-        reader = csv.reader(f)
-        rows = [row for row in reader if row and any(c.strip() for c in row)]
-
-    if not rows:
-        raise RuntimeError(f"Age/gender intersection file is empty: {path}")
-
-    def _looks_like_age(token):
-        try:
-            val = float(token.strip())
-            return 0 <= val <= 120
-        except ValueError:
-            return False
-
-    def _looks_like_gender(token):
-        return token.strip().upper() in ('M', 'F', 'MALE', 'FEMALE', '0', '1')
-
-    parsed_count = 0
-    ambiguous_rows = []
-    for row in rows:
-        if len(row) < 3:
-            continue
-        try:
-            sid = int(row[0].strip())
-        except ValueError:
-            continue
-
-        col1, col2 = row[1].strip(), row[2].strip()
-        age_token = None
-        if _looks_like_age(col1) and _looks_like_gender(col2):
-            age_token = col1
-        elif _looks_like_gender(col1) and _looks_like_age(col2):
-            age_token = col2
-        else:
-            ambiguous_rows.append(row)
-            continue
-
-        age_map[sid] = float(age_token)
-        parsed_count += 1
-
-    if parsed_count == 0:
-        raise RuntimeError(
-            f"Could not parse ANY (subject_id, age, gender) triples from "
-            f"{path}. Expected 3 columns: subject_id, then age and "
-            f"gender in either order. First few raw rows: {rows[:5]}. "
-            f"Update _load_age_gender_intersection() in "
-            f"datasets/oulp_mvlp.py once the actual file format is "
-            f"confirmed."
-        )
-    if ambiguous_rows:
-        print(
-            f"[WARNING] {len(ambiguous_rows)} rows in {path} could not "
-            f"be unambiguously parsed and were skipped. First example: "
-            f"{ambiguous_rows[0]}"
-        )
+    _, age_map = _load_subject_info(path)
     return age_map
+
+
 
 
 # -- Sequence discovery on disk -------------------------------------------------
@@ -596,8 +494,8 @@ def build_oulp_mvlp_dataloaders(cfg):
         cfg['dataset']['root']
         cfg['dataset']['sequence_length']
         cfg['dataset']['image_size']
-        cfg['dataset']['gender_label_file']
-        cfg['dataset']['age_gender_intersection_file']
+        cfg['dataset']['id_list_file']          -- ID_list.csv
+        cfg['dataset']['subject_info_file']      -- subject_info_OUMVLP.csv
         cfg['dataset'].get('cross_view', False)  -- the protocol flag
         cfg['training']['batch_size'], ['num_workers'], ['P'], ['K']
         cfg['dataset'].get('val_fraction', 0.1)
@@ -618,40 +516,17 @@ def build_oulp_mvlp_dataloaders(cfg):
     val_frac    = cfg['dataset'].get('val_fraction', 0.1)
     cross_view  = cfg['dataset'].get('cross_view', False)
 
-    # Standard OU-MVLP train/test split -- BY SUBJECT ID RANGE, not
-    # random/stratified. See module docstring for why this matters.
-    train_ids_theoretical = set(_id_list_from_range(1, TRAIN_ID_MAX))
-    test_ids_theoretical  = set(_id_list_from_range(TRAIN_ID_MAX + 1, 10307))
-
-    # Filter against subjects ACTUALLY present on disk -- for the real
-    # full dataset these are identical to the theoretical sets above
-    # (all 10,307 official subjects present), but for any partial
-    # download or test data, using the unfiltered theoretical range
-    # here would silently let _collect_sequences_for_view_seq() ignore
-    # thousands of nonexistent IDs downstream with no visible signal
-    # that anything was actually missing -- discovering and reporting
-    # this explicitly here makes a partial/incomplete dataset visible
-    # immediately, rather than only showing up as oddly-small gallery/
-    # probe sizes deep in evaluator output.
-    subjects_on_disk = _discover_subjects_on_disk(root)
-    if not subjects_on_disk:
-        raise RuntimeError(
-            f"Could not find any subjects on disk under {root} when "
-            f"scanning the reference Silhouette_{VIEWS[0]}-01 folder. "
-            f"Confirm the root path is correct and the expected "
-            f"Silhouette_{{view}}-{{seq}} folders exist (run "
-            f"`python datasets/oulp_mvlp.py {root} ...` for a full "
-            f"diagnostic)."
-        )
-
-    train_ids_all = sorted(train_ids_theoretical & subjects_on_disk)
-    test_ids      = sorted(test_ids_theoretical & subjects_on_disk)
-
-    gender_map = _load_gender_map(
-        os.path.join(root, cfg['dataset']['gender_label_file'])
+    # Load train/test split from ID_list.csv (paired columns format,
+    # confirmed from real downloaded file -- see _load_train_test_split)
+    train_ids_all, test_ids = _load_train_test_split(
+        os.path.join(root, cfg['dataset']['id_list_file'])
     )
-    age_map = _load_age_gender_intersection(
-        os.path.join(root, cfg['dataset']['age_gender_intersection_file'])
+
+    # Load gender + age from subject_info_OUMVLP.csv (single combined
+    # file, confirmed from real downloaded data -- age '-' means no
+    # label for that subject, handled in _load_subject_info)
+    gender_map, age_map = _load_subject_info(
+        os.path.join(root, cfg['dataset']['subject_info_file'])
     )
 
     # Val split: stratified by gender, carved from the TRAINING subject
@@ -729,23 +604,9 @@ def build_oulp_mvlp_dataloaders(cfg):
     print(f"Age-labeled subjects (intersection with age/gender file): "
           f"{n_age_labeled} / {len(gender_map)} total subjects")
     print(f"Train/test split (standard OU-MVLP subject-ID-range split, "
-          f"boundary at {TRAIN_ID_MAX}):")
-    print(f"  Train: {len(all_train_ids)} subjects "
-          f"(theoretical range 1-{TRAIN_ID_MAX}, "
-          f"{len(train_ids_theoretical)} theoretical, "
-          f"{len(all_train_ids)} actually found on disk)")
-    print(f"  Test:  {len(test_ids)} subjects "
-          f"(theoretical range {TRAIN_ID_MAX+1}-10307, "
-          f"{len(test_ids_theoretical)} theoretical, "
-          f"{len(test_ids)} actually found on disk)")
-    if len(all_train_ids) < len(train_ids_theoretical) or \
-       len(test_ids) < len(test_ids_theoretical):
-        print(
-            f"  [NOTE] Found subject count is below the theoretical full "
-            f"dataset size -- expected for a partial download or "
-            f"synthetic test data; verify this matches your intended "
-            f"data before training for real."
-        )
+          f"(from ID_list.csv):")
+    print(f"  Train: {len(all_train_ids)} subjects")
+    print(f"  Test:  {len(test_ids)} subjects")
     print(f"Evaluation mode: {'cross_view (literature-standard, 182 pairs)' if cross_view else 'same_view (default, 14 independent protocols)'}")
 
     meta = DatasetMeta(
@@ -788,11 +649,11 @@ if __name__ == '__main__':
         print(__doc__)
         print(
             "\nUsage: python datasets/oulp_mvlp.py <root> "
-            "<gender_label_file> <age_gender_intersection_file>"
+            "<id_list_file> <subject_info_file>"
         )
         sys.exit(1)
 
-    root, gender_file, age_file = sys.argv[1:4]
+    root, id_list_file, subject_info_file = sys.argv[1:4]
 
     print("=== OU-MVLP format verification ===\n")
 
@@ -809,17 +670,14 @@ if __name__ == '__main__':
         print(f"      MISSING: {sorted(missing)[:10]}"
               f"{'...' if len(missing) > 10 else ''}")
 
-    print(f"\n[2/4] Loading gender labels from {gender_file}...")
-    gender_map = _load_gender_map(os.path.join(root, gender_file))
-    n_male   = sum(1 for g in gender_map.values() if g == 0)
-    n_female = sum(1 for g in gender_map.values() if g == 1)
-    print(f"      {len(gender_map)} subjects: {n_male} M, {n_female} F "
-          f"(expect ~5114 M, ~5193 F per official page)")
+    print(f"\n[2/4] Loading train/test split from {id_list_file}...")
+    train_ids, test_ids = _load_train_test_split(os.path.join(root, id_list_file))
+    print(f"      Train: {len(train_ids)} subjects, Test: {len(test_ids)} subjects")
+    print(f"      (expect 5153 train, 5154 test)")
 
-    print(f"\n[3/4] Loading age/gender intersection from {age_file}...")
-    age_map = _load_age_gender_intersection(os.path.join(root, age_file))
-    print(f"      {len(age_map)} subjects with age labels. "
-          f"Age range: {min(age_map.values()):.0f}-{max(age_map.values()):.0f} "
+    print(f"\n[3/4] Loading gender + age from {subject_info_file}...")
+    gender_map, age_map = _load_subject_info(os.path.join(root, subject_info_file))
+    print(f"      Age range: {min(age_map.values()):.0f}-{max(age_map.values()):.0f} "
           f"(expect roughly 2-87 per official page)")
 
     print(f"\n[4/4] Scanning one view-seq folder for subject/frame structure...")

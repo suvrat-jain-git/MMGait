@@ -1,19 +1,3 @@
-"""
-visualization.py — Training Curves and Evaluation Plots
-
-Produces:
-    plot_training_curves   -- loss curves from training log CSV
-    plot_cmc_curves        -- CMC curves per protocol
-    plot_gender_confusion  -- confusion matrix for gender head
-    plot_embedding_tsne    -- t-SNE of identity embeddings
-    plot_pipeline_panel    -- silhouette -> GEI -> motion-map comparison
-                              panel (pre/post static suppression), for
-                              the paper's architecture-illustration figure
-
-All plots saved as PNG to a specified output directory.
-Requires: matplotlib, sklearn (for t-SNE)
-"""
-
 import numpy as np
 from pathlib import Path
 
@@ -330,9 +314,15 @@ def plot_pipeline_panel(
 
     # Temporal mean of the motion maps, for a single representative image
     # per motion-map type (see docstring rationale above).
-    motion_pre_mean  = motion_pre[0].mean(axis=0)   # [H, W]
-    motion_post_mean = motion_post[0].mean(axis=0)  # [H, W]
-    gei_img          = gei[0]                        # [H, W]
+    motion_pre_mean  = motion_pre[0].mean(axis=0)              # [H, W]
+    # Clip post-suppression to [0, inf) -- negative values result from
+    # subtracting the GEI (background regions where motion - GEI < 0).
+    # Without clipping, inferno colormap maps negatives to orange/yellow
+    # making the background look like high-activation, which is
+    # visually misleading. After clipping, background is dark (zero)
+    # and only genuine motion regions show as bright.
+    motion_post_mean = np.clip(motion_post[0].mean(axis=0), 0, None)  # [H, W]
+    gei_img          = gei[0]                                 # [H, W]
 
     n_cols = max(n_frames_shown, 3)
     fig, axes = plt.subplots(2, n_cols, figsize=(2.2 * n_cols, 5))
@@ -348,19 +338,17 @@ def plot_pipeline_panel(
 
     # Row 2: GEI, motion-pre, motion-post (left-aligned, rest blank)
     row2_imgs  = [gei_img, motion_pre_mean, motion_post_mean]
-    row2_names = ['GEI\n(morphology input)',
-                  'Motion map\n(pre-suppression)',
-                  'Motion map\n(post-suppression)']
+    row2_names = ['GEI\n(morphology branch input)',
+                  'Motion energy\n(pre-suppression)',
+                  'Motion energy\n(post-suppression)\nstatic shape removed']
     for col in range(n_cols):
         ax = axes[1, col]
         if col < len(row2_imgs):
-            # Motion maps use a perceptually distinct colormap from the
-            # raw grayscale silhouettes, so it's visually obvious these
-            # are a DIFFERENT kind of signal (intensity = amount of
-            # motion, not silhouette presence/absence).
             cmap = 'gray' if col == 0 else 'inferno'
-            ax.imshow(row2_imgs[col], cmap=cmap)
+            im = ax.imshow(row2_imgs[col], cmap=cmap)
             ax.set_title(row2_names[col], fontsize=9)
+            if col > 0:
+                plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
         ax.axis('off')
 
     fig.suptitle(title, fontsize=13, y=1.02)
